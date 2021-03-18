@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import CategoriesModel, FoodModel
-from .serializers import CategoriesSerializer, FoodSerializer
+from .models import CategoriesModel, FoodModel, GetFoodModel, TableModel
+from .serializers import CategoriesSerializer, FoodSerializer, GetFoodSerializer, TableSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 # Create your views here.
@@ -70,8 +70,8 @@ class SearchCagoriesView(APIView):
         
 class getFoodView(APIView):
     def get(self, request):
-        food=FoodModel.objects.all()
-        serializer = FoodSerializer(food, many=True)
+        food=GetFoodModel.objects.raw("select F.id, F.food_name, F.food_price, F.food_image, Ca.category_name from food_table_manager_foodmodel F  inner join food_table_manager_categoriesmodel Ca on F.category_id=Ca.id")
+        serializer = GetFoodSerializer(food, many=True)
         response={
             "data": serializer.data,
             "status_code": status.HTTP_200_OK,
@@ -89,3 +89,13 @@ class CreateFoodView(APIView):
            'status_code': status.HTTP_201_CREATED
         }
         return Response(response, status=status.HTTP_201_CREATED)
+
+class getTableView(APIView):
+    def get(self, request):
+        table=TableModel.objects.all()
+        serializer = TableSerializer(table, many=True)
+        response={
+            "data": serializer.data,
+            "status_code": status.HTTP_200_OK,
+        }
+        return Response(response, status=status.HTTP_200_OK)

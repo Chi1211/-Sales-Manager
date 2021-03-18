@@ -75,7 +75,7 @@ class SearchMaterialView(APIView):
 
 class getImportMaterialView(APIView):
     def get(self, request):
-        import_material=GetImportMaterialModel.objects.raw('select I.id, Ma.material_name, S.supplier_name, I.amount, I.price, I.import_date from material_importmaterialmodel I inner join material_materialmodel Ma on Ma.id=I.id inner join supplier_suppliermodel S on S.id=I.id')
+        import_material=GetImportMaterialModel.objects.raw('select I.id, Ma.material_name, S.supplier_name, I.amount, I.price, I.import_date from material_importmaterialmodel I inner join material_materialmodel Ma on Ma.id=I.material_id_id inner join supplier_suppliermodel S on S.id=I.supplier_id_id')
         serializer = GetImportMaterialSerializer(import_material, many=True)
         response={
             "data": serializer.data,
@@ -84,20 +84,18 @@ class getImportMaterialView(APIView):
         return Response(response, status=status.HTTP_200_OK)
         
 class CreateImportMaterialView(APIView):
-    def get(self, request):
-        import_material=ImportMaterialModel.objects.all()
-        serializer = ImportMaterialSerializer(import_material, many=True)
-        response={
-            "data": serializer.data,
-            "status_code": status.HTTP_200_OK,
-        }
-        return Response(response, status=status.HTTP_200_OK)
     def post(self, request):
-        serializer=ImportMaterialSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        try:
+            datas = request.data['data']
+        except:
+            return Response({'errors':'errors'}, status=status.HTTP_400_BAD_REQUEST)
+
+        for data in datas:
+            serializer=ImportMaterialSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
         response={
-           'data': serializer.data,
+           'success': 'successed',
            'status_code': status.HTTP_201_CREATED
         }
         return Response(response, status=status.HTTP_201_CREATED)
@@ -106,7 +104,7 @@ class SearchImportMaterialNameView(APIView):
     def get(self, request):
         name=request.data["material_name"]
         
-        import_material=GetImportMaterialModel.objects.raw("select I.id, Ma.material_name, S.supplier_name, I.amount, I.price, I.import_date from material_importmaterialmodel I inner join material_materialmodel Ma on Ma.id=I.id inner join supplier_suppliermodel S on S.id=I.id where Ma.material_name like '%%"+name+"%%'")
+        import_material=GetImportMaterialModel.objects.raw("select I.id, Ma.material_name, S.supplier_name, I.amount, I.price, I.import_date from material_importmaterialmodel I inner join material_materialmodel Ma on Ma.id=I.material_id_id inner join supplier_suppliermodel S on S.id=I.supplier_id_id where Ma.material_name like '%%"+name+"%%'")
         serializer = GetImportMaterialSerializer(import_material, many=True)
         response={
             "data": serializer.data,
@@ -118,7 +116,7 @@ class SearchImportMaterialDateView(APIView):
     def get(self, request):
         from_date=request.data["from_date"]
         to_date=request.data["to_date"]
-        import_material=GetImportMaterialModel.objects.raw("select I.id, Ma.material_name, S.supplier_name, I.amount, I.price, I.import_date from material_importmaterialmodel I inner join material_materialmodel Ma on Ma.id=I.id inner join supplier_suppliermodel S on S.id=I.id where I.import_date BETWEEN '"+ from_date +"' AND '"+to_date+"'")
+        import_material=GetImportMaterialModel.objects.raw("select I.id, Ma.material_name, S.supplier_name, I.amount, I.price, I.import_date from material_importmaterialmodel I inner join material_materialmodel Ma on Ma.id=I.material_id_id inner join supplier_suppliermodel S on S.id=I.supplier_id_id where I.import_date BETWEEN '"+ from_date +"' AND '"+to_date+"'")
         serializer = GetImportMaterialSerializer(import_material, many=True)
         response={
             "data": serializer.data,
