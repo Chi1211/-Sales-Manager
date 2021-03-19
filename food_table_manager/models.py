@@ -22,6 +22,16 @@ class GetFoodModel(models.Model):
 
 
 class TableModel(models.Model):
-    # status=models.CharField(max_length=255, choices=["Có người": 1, "Trống": 2, "Tạm ngưng hoạt động": 3], default="Trống")
+    status=models.CharField(max_length=255, choices=[('Có người', 'Có người'), ("Trống", "Trống"), ("Tạm ngưng hoạt động", "Tạm ngưng hoạt động")], default="Trống")
     person=models.IntegerField()
 
+    # def __str__(self):
+    #     return self.id
+
+class BookTableModel(models.Model):
+    table=models.ForeignKey(TableModel, on_delete=models.CASCADE)
+    time_book=models.DateTimeField(auto_now=True)
+    name_book=models.CharField(max_length=255)
+    phone_book=models.CharField(max_length=15)
+    number_of_people=models.IntegerField()
+    money_book=models.DecimalField(max_digits=19,  decimal_places=2)

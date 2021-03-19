@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import CategoriesModel, FoodModel, GetFoodModel, TableModel
-from .serializers import CategoriesSerializer, FoodSerializer, GetFoodSerializer, TableSerializer
+from .models import CategoriesModel, FoodModel, GetFoodModel, TableModel, BookTableModel
+from .serializers import CategoriesSerializer, FoodSerializer, GetFoodSerializer, TableSerializer, BookTableSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 # Create your views here.
@@ -29,7 +29,7 @@ class CreateCategoriesView(APIView):
         return Response(response, status=status.HTTP_201_CREATED)
 
 class UpdateCategoriesView(APIView):
-    permission_classes=(IsAuthenticated,IsAdminUser, )
+    permission_classes=(IsAuthenticated, IsAdminUser)
     def get_object(self, pk):
         try: 
             categories=CategoriesModel.objects.get(pk=pk)
@@ -99,3 +99,55 @@ class getTableView(APIView):
             "status_code": status.HTTP_200_OK,
         }
         return Response(response, status=status.HTTP_200_OK)
+
+class CreateTableView(APIView):
+    
+    def post(self, request):
+        serializer=TableSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        response={
+           'data': serializer.data,
+           'status_code': status.HTTP_201_CREATED
+        }
+        return Response(response, status=status.HTTP_201_CREATED)
+
+class UpdateTableView(APIView):
+    def get_object(self, pk):
+        try: 
+            table=TableModel.objects.get(pk=pk)
+            return table
+        except TableModel.DoesNotExist:
+            return Response({"errors":"errors"}, status=404)
+    def get(self, request, pk):
+        table=self.get_object(pk)
+        serializer=TableSerializer(table)
+        
+        response={
+            "data": serializer.data,
+            "status_code": 200
+        }
+        return Response(response, status=200)
+    def put(self, renquest, pk):
+        table=self.get_object(pk)
+        serializer=TableSerializer(table, data=renquest.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        response={
+            'data': serializer.data,
+            'status_code': status.HTTP_200_OK
+        }
+        return Response(response, status=status.HTTP_200_OK)
+
+class SearchTableView(APIView):
+    def get(self, request):
+        statuss=request.data["status"]
+        table=TableModel.objects.filter(status=statuss)
+        serializer = TableSerializer(table, many=True)
+        response={
+            "data": serializer.data,
+            "status_code": status.HTTP_200_OK,
+        }
+        return Response(response, status=status.HTTP_200_OK)
+
+   

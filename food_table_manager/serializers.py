@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CategoriesModel, FoodModel, GetFoodModel, TableModel
+from .models import CategoriesModel, FoodModel, GetFoodModel, TableModel, BookTableModel
 
 class CategoriesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,4 +20,9 @@ class GetFoodSerializer(serializers.ModelSerializer):
 class TableSerializer(serializers.ModelSerializer):
     class Meta:
         model=TableModel
+        fields='__all__'
+
+class BookTableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=BookTableModel
         fields='__all__'
