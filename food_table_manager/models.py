@@ -1,4 +1,5 @@
 from django.db import models
+from material.models import MaterialModel
 
 # Create your models here.
 class CategoriesModel(models.Model):
@@ -9,14 +10,14 @@ class CategoriesModel(models.Model):
 
 class FoodModel(models.Model):
     food_name=models. CharField(max_length=255)
-    food_price=models.DecimalField(max_digits=19,  decimal_places=2)
+    food_price=models.DecimalField(max_digits=19,  decimal_places=0)
     category=models.ForeignKey(CategoriesModel, on_delete=models.CASCADE)
     food_image=models.ImageField(upload_to='food/', null=True, blank=True)
 
 class GetFoodModel(models.Model):
     id=models.IntegerField(primary_key=True)
     food_name=models. CharField(max_length=255)
-    food_price=models.DecimalField(max_digits=19,  decimal_places=2)
+    food_price=models.DecimalField(max_digits=19,  decimal_places=0)
     food_image=models.ImageField(upload_to='food/', null=True, blank=True)
     category_name=models.CharField(max_length=255)
 
@@ -35,3 +36,15 @@ class BookTableModel(models.Model):
     phone_book=models.CharField(max_length=15)
     number_of_people=models.IntegerField()
     money_book=models.DecimalField(max_digits=19,  decimal_places=2)
+
+class DetailFoodModel(models.Model):
+    food= models.ForeignKey(FoodModel, on_delete=models.CASCADE)
+    material=models.ForeignKey(MaterialModel, on_delete=models.CASCADE)
+    amount_material=models.IntegerField(default=1)
+
+class getDetailFoodModel(models.Model):
+    id=models.IntegerField(primary_key=True)
+    material_name=models.CharField(max_length=255)
+    amount_material=models.IntegerField(default=1)
+
+

@@ -15,7 +15,7 @@ class ImportMaterialModel(models.Model):
     material_id=models.ForeignKey(MaterialModel, on_delete=models.CASCADE)
     amount=models.IntegerField()
     price=models.DecimalField(max_digits=19, decimal_places=3)
-    import_date=models.DateTimeField()
+    import_date=models.DateTimeField(auto_now=True)
 
 class GetImportMaterialModel(models.Model):
     id=models.IntegerField(primary_key=True)

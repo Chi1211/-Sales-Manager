@@ -11,4 +11,8 @@ urlpatterns=[
     path('create_table/', views.CreateTableView.as_view(), name='create_table'),
     path('detail_table/<int:pk>', views.UpdateTableView.as_view(), name='detail_table'),
     path('search_table/', views.SearchTableView.as_view(), name='search_table'),
+    path('detail_food/<int:pk>', views.UpdateFoodView.as_view(), name='detail_food'),
+    path('create_detailfood/', views.CreateDetailFoodView.as_view(), name='create_detailfood'),
+    path('get_detailfood/<int:pk>', views.getDetailFoodView.as_view(), name='get_detailfood'),
+    path('detail_detailfood/<int:pk>', views.UpdateDetailFooView.as_view(), name='detail_detailfood'),
 ]

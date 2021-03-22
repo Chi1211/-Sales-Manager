@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import CategoriesModel, FoodModel, GetFoodModel, TableModel, BookTableModel
-from .serializers import CategoriesSerializer, FoodSerializer, GetFoodSerializer, TableSerializer, BookTableSerializer
+from .models import CategoriesModel, FoodModel, GetFoodModel, TableModel, BookTableModel, DetailFoodModel, getDetailFoodModel
+from .serializers import CategoriesSerializer, FoodSerializer, GetFoodSerializer, TableSerializer, BookTableSerializer, DetailFoodSerializer, getDetailFoodSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from django.db.models import Max
 # Create your views here.
 class getCategoriesView(APIView):
     def get(self, request):
@@ -66,8 +67,7 @@ class SearchCagoriesView(APIView):
             "status_code": status.HTTP_200_OK,
         }
         return Response(response, status=status.HTTP_200_OK)
-
-        
+       
 class getFoodView(APIView):
     def get(self, request):
         food=GetFoodModel.objects.raw("select F.id, F.food_name, F.food_price, F.food_image, Ca.category_name from food_table_manager_foodmodel F  inner join food_table_manager_categoriesmodel Ca on F.category_id=Ca.id")
@@ -89,6 +89,100 @@ class CreateFoodView(APIView):
            'status_code': status.HTTP_201_CREATED
         }
         return Response(response, status=status.HTTP_201_CREATED)
+
+class UpdateFoodView(APIView):
+
+    def get_object(self, pk):
+        try: 
+            food=FoodModel.objects.get(pk=pk)
+            return food
+        except FoodModel.DoesNotExist:
+            return Response({"errors":"errors"}, status=404)
+    def get(self, request, pk):
+        food=self.get_object(pk)
+        serializer=FoodSerializer(food)
+        
+        response={
+            "data": serializer.data,
+            "status_code": 200
+        }
+        return Response(response, status=200)
+    def put(self, renquest, pk):
+        food=self.get_object(pk)
+        serializer=FoodSerializer(food, data=renquest.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        response={
+            'data': serializer.data,
+            'status_code': status.HTTP_200_OK
+        }
+        return Response(response, status=status.HTTP_200_OK)
+
+class getDetailFoodView(APIView):
+    def get(self, request, pk):
+        # return Response(food_id, status=status.HTTP_200_OK)
+        detail_food=getDetailFoodModel.objects.raw('select D.id, Ma.material_name, D.amount_material from food_table_manager_detailfoodmodel D inner join material_materialmodel Ma on Ma.id=D.material_id inner join food_table_manager_foodmodel F on F.id=D.food_id where D.food_id='+str(pk))
+        serializer = getDetailFoodSerializer(detail_food, many=True)
+        response={
+            "data": serializer.data,
+            "status_code": status.HTTP_200_OK,
+        }
+        return Response(response, status=status.HTTP_200_OK)
+
+class CreateDetailFoodView(APIView):
+    def post(self, request):
+        try:
+            datas = request.data['data']
+        except:
+            return Response({'errors':'errors'}, status=status.HTTP_400_BAD_REQUEST)
+
+        for data in datas:
+            food_id=FoodModel.objects.all().aggregate(Max('id'))
+            serializer=DetailFoodSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(food_id=food_id['id__max'])
+        response={
+           'success': 'success',
+           'status_code': status.HTTP_201_CREATED
+        }
+        return Response(response, status=status.HTTP_201_CREATED)
+
+class UpdateDetailFooView(APIView):
+    def get_object(self, pk):
+        try: 
+            detail_food=DetailFoodModel.objects.get(pk=pk)
+            return detail_food
+        except DetailFoodModel.DoesNotExist:
+            # return Response({"errors":"errors"}, status=404)
+            raise {"gfd":"dgz"}
+    # def put(self, renquest, pk):
+    #     food=self.get_object(pk)
+    #     serializer=FoodSerializer(food, data=renquest.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     response={
+    #         'data': serializer.data,
+    #         'status_code': status.HTTP_200_OK
+    #     }
+    #     return Response(response, status=status.HTTP_200_OK)
+    def get(self, request, pk):
+        food=self.get_object(pk)
+        serializer=DetailFoodSerializer(food)
+        
+        response={
+            "data": serializer.data,
+            "status_code": 200
+        }
+        return Response(response, status=200)
+    def delete(self,request,  pk):
+        detail_food=self.get_object(pk)
+        detail_food.delete()
+        response={
+            'success':"success",
+            "status_code": status.HTTP_200_OK
+        }
+        return Response(response, status=status.HTTP_200_OK)
+
 
 class getTableView(APIView):
     def get(self, request):

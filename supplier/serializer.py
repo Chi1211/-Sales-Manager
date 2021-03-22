@@ -4,3 +4,5 @@ class SupplierSerialier(serializers.ModelSerializer):
     class Meta:
         model=SupplierModel
         fields='__all__'
+
+        ordering = ['supplier_name', 'pk']
