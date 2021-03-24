@@ -72,7 +72,6 @@ class SearchMaterialView(APIView):
         }
         return Response(response, status=status.HTTP_200_OK)
 
-
 class getImportMaterialView(APIView):
     def get(self, request):
         import_material=GetImportMaterialModel.objects.raw('select I.id, Ma.material_name, S.supplier_name, I.amount, I.price, I.import_date from material_importmaterialmodel I inner join material_materialmodel Ma on Ma.id=I.material_id_id inner join supplier_suppliermodel S on S.id=I.supplier_id_id')

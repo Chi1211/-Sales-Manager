@@ -18,7 +18,6 @@ class GetFoodSerializer(serializers.ModelSerializer):
         fields='__all__'
         ordering = ['food_name']
 
-
 class TableSerializer(serializers.ModelSerializer):
     class Meta:
         model=TableModel
@@ -33,12 +32,6 @@ class DetailFoodSerializer(serializers.ModelSerializer):
     class Meta:
         model=DetailFoodModel
         fields=['material', 'amount_material']
-
-    # def create(self, validated_data):
-    #     id_food=FoodModel.objects.raw('select max(id) from food_table_manager_foodmodel')
-    #     material=validated_data['material']
-    #     amount_material=validated_data['amount_material']
-    #     return DetailFoodModel.objects.create(id_food, material, amount_material)
 
 class getDetailFoodSerializer(serializers.ModelSerializer):
     class Meta:

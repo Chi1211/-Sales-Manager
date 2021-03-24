@@ -57,7 +57,7 @@ class UpdateCategoriesView(APIView):
         }
         return Response(response, status=status.HTTP_200_OK)
 
-class SearchCagoriesView(APIView):
+class SearchCategoriesView(APIView):
     def get(self, request):
         name=request.data["category_name"]
         categories=CategoriesModel.objects.filter(category_name__contains=name)
@@ -71,6 +71,17 @@ class SearchCagoriesView(APIView):
 class getFoodView(APIView):
     def get(self, request):
         food=GetFoodModel.objects.raw("select F.id, F.food_name, F.food_price, F.food_image, Ca.category_name from food_table_manager_foodmodel F  inner join food_table_manager_categoriesmodel Ca on F.category_id=Ca.id")
+        serializer = GetFoodSerializer(food, many=True)
+        response={
+            "data": serializer.data,
+            "status_code": status.HTTP_200_OK,
+        }
+        return Response(response, status=status.HTTP_200_OK)
+
+class getCategoryFoodView(APIView):
+    def get(self, request):
+        category=request.data['category']
+        food=GetFoodModel.objects.raw("select F.id, F.food_name, F.food_price, F.food_image from food_table_manager_foodmodel F inner join food_table_manager_categoriesmodel Ca on F.category_id=Ca.id where Ca.category_name='"+category+"'")
         serializer = GetFoodSerializer(food, many=True)
         response={
             "data": serializer.data,
@@ -129,6 +140,24 @@ class getDetailFoodView(APIView):
         }
         return Response(response, status=status.HTTP_200_OK)
 
+    def post(self, request, pk):
+        try:
+            datas = request.data['data']
+        except:
+            return Response({'errors':'errors'}, status=status.HTTP_400_BAD_REQUEST)
+        for data in datas:    
+            detail= DetailFoodModel.objects.filter(material=data['material'], food=pk)
+            if detail:
+                detail.update(amount_material= data['amount_material'])
+                # detail_food= DetailFoodModel.objects.update(material=data['material'], food=pk, amount_material= data['amount_material'])               
+            else: 
+                DetailFoodModel.objects.create(material_id=data['material'], food_id=pk, amount_material= data['amount_material'])
+        response={
+            "success":"success",
+            "status_code": 200
+            }
+        return Response(response, status=200)
+
 class CreateDetailFoodView(APIView):
     def post(self, request):
         try:
@@ -138,6 +167,7 @@ class CreateDetailFoodView(APIView):
 
         for data in datas:
             food_id=FoodModel.objects.all().aggregate(Max('id'))
+            print(food_id, "AAA")
             serializer=DetailFoodSerializer(data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save(food_id=food_id['id__max'])
@@ -153,27 +183,8 @@ class UpdateDetailFooView(APIView):
             detail_food=DetailFoodModel.objects.get(pk=pk)
             return detail_food
         except DetailFoodModel.DoesNotExist:
-            # return Response({"errors":"errors"}, status=404)
-            raise {"gfd":"dgz"}
-    # def put(self, renquest, pk):
-    #     food=self.get_object(pk)
-    #     serializer=FoodSerializer(food, data=renquest.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save()
-    #     response={
-    #         'data': serializer.data,
-    #         'status_code': status.HTTP_200_OK
-    #     }
-    #     return Response(response, status=status.HTTP_200_OK)
-    def get(self, request, pk):
-        food=self.get_object(pk)
-        serializer=DetailFoodSerializer(food)
-        
-        response={
-            "data": serializer.data,
-            "status_code": 200
-        }
-        return Response(response, status=200)
+            return Response({"errors":"errors"}, status=404)
+
     def delete(self,request,  pk):
         detail_food=self.get_object(pk)
         detail_food.delete()
@@ -182,7 +193,6 @@ class UpdateDetailFooView(APIView):
             "status_code": status.HTTP_200_OK
         }
         return Response(response, status=status.HTTP_200_OK)
-
 
 class getTableView(APIView):
     def get(self, request):
@@ -194,8 +204,7 @@ class getTableView(APIView):
         }
         return Response(response, status=status.HTTP_200_OK)
 
-class CreateTableView(APIView):
-    
+class CreateTableView(APIView):   
     def post(self, request):
         serializer=TableSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -244,4 +253,53 @@ class SearchTableView(APIView):
         }
         return Response(response, status=status.HTTP_200_OK)
 
-   
+class BookTableView(APIView):    
+    def get(self, request):
+        book=BookTableModel.objects.all()
+        serializer = BookTableSerializer(book, many=True)
+        response={
+            "data": serializer.data,
+            "status_code": status.HTTP_200_OK,
+        }
+        return Response(response, status=status.HTTP_200_OK)
+    def post(self, request):
+        serializer=BookTableSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        response={
+           'data': serializer.data,
+           'status_code': status.HTTP_201_CREATED
+        }
+        return Response(response, status=status.HTTP_201_CREATED)
+
+class UpdateBookTableView(APIView):
+    def get_object(self, pk):
+        try: 
+            # book=BookTableModel.objects.raw("select id, table_id as table, time_book, name_book, phone_book, number_of_people, money_book from food_table_manager_booktablemodel where id=(select max(id) from food_table_manager_booktablemodel where table_id="+str(pk)+")")
+            # print(book, 'AAA')
+            book=BookTableModel.objects.filter(table=pk).aggregate(Max('id'))
+            detail_book=BookTableModel.objects.get(pk=book['id__max'])
+            # detail_book=BookTableModel.objects.get(pk=pk)
+            print(book, 'AAA')
+            return detail_book
+        except BookTableModel.DoesNotExist:
+            return Response({"errors":"errors"}, status=404)
+    def get(self, request, pk):
+        book=self.get_object(pk)
+        serializer=BookTableSerializer(book)
+        
+        response={
+            "data": serializer.data,
+            "status_code": 200
+        }
+        return Response(response, status=200)
+    def put(self, renquest, pk):
+        book=self.get_object(pk)
+        serializer=BookTableSerializer(book, data=renquest.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        response={
+            'data': serializer.data,
+            'status_code': status.HTTP_200_OK
+        }
+        return Response(response, status=status.HTTP_200_OK)
