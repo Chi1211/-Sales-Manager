@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'supplier',
     'material',
     'food_table_manager',
+    'order',
 ]
 
 MIDDLEWARE = [

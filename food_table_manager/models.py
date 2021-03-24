@@ -31,7 +31,7 @@ class BookTableModel(models.Model):
     name_book=models.CharField(max_length=255)
     phone_book=models.CharField(max_length=15)
     number_of_people=models.IntegerField()
-    money_book=models.DecimalField(max_digits=19,  decimal_places=2)
+    money_book=models.DecimalField(max_digits=19,  decimal_places=0)
 
 class DetailFoodModel(models.Model):
     food= models.ForeignKey(FoodModel, on_delete=models.CASCADE)

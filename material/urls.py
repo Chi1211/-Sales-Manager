@@ -9,4 +9,6 @@ urlpatterns=[
     path('list_importmaterial/', views.CreateImportMaterialView.as_view(), name="list_material"),
     path('search_name_importmaterial/', views.SearchImportMaterialNameView.as_view(), name="search_name_importmaterial"),
     path('search_date_importmaterial/', views.SearchImportMaterialDateView.as_view(), name="search_date_importmaterial"),
+    path('sum_price/', views.SumPriceView.as_view()),
+    
 ]

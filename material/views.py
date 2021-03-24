@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import MaterialSerializer, ImportMaterialSerializer, GetImportMaterialSerializer
 from .models import  MaterialModel, ImportMaterialModel, GetImportMaterialModel
+from django.db import connection
+from django.db.models import Sum
 # Create your views here.
 class getMaterialView(APIView):
     def get(self, request):
@@ -123,5 +125,12 @@ class SearchImportMaterialDateView(APIView):
         }
         return Response(response, status=status.HTTP_200_OK)
 
-
-
+class SumPriceView(APIView):
+    def get(self, request):        
+        price=ImportMaterialModel.objects.all().aggregate(Sum('price'))
+        print(price, 'AAA')
+        response={
+            "price": price['price__sum'],
+            "status_code": status.HTTP_200_OK,
+        }
+        return Response(response, status=status.HTTP_200_OK)
