@@ -6,6 +6,7 @@ from .serializers import CategoriesSerializer, FoodSerializer, GetFoodSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django.db.models import Max
+from django.db import connection
 # Create your views here.
 class getCategoriesView(APIView):
     def get(self, request):
@@ -79,8 +80,7 @@ class getFoodView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class getCategoryFoodView(APIView):
-    def get(self, request):
-        category=request.data['category']
+    def get(self, request, category ):
         food=GetFoodModel.objects.raw("select F.id, F.food_name, F.food_price, F.food_image from food_table_manager_foodmodel F inner join food_table_manager_categoriesmodel Ca on F.category_id=Ca.id where Ca.category_name='"+category+"'")
         serializer = GetFoodSerializer(food, many=True)
         response={
@@ -263,6 +263,9 @@ class BookTableView(APIView):
         }
         return Response(response, status=status.HTTP_200_OK)
     def post(self, request):
+        table=request.data['table']
+        with connection.cursor() as cursor:
+            cursor.execute(f"update food_table_manager_tablemodel set status='Bàn đã đặt' where id={table}")
         serializer=BookTableSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()

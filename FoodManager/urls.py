@@ -23,4 +23,5 @@ urlpatterns = [
     path('material/', include('material.urls')),
     path('food_tabel/', include('food_table_manager.urls')),
     path('order/', include('order.urls')),
+    path('comsum/', include('comsum.urls')),
 ]
