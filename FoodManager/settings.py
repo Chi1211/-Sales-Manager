@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'FoodManager.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'FoodManager',
+        'NAME': 'MiniStore',
         'USER': 'postgres',
         'PASSWORD': 'bichchi',
         'HOST': 'localhost',

@@ -1,8 +1,7 @@
 from django.shortcuts import render
-from .models import BillModel, DetailBillModel, DatabaseListBill, PrintBill, SumMoneyBill, SaveConsumption
-from .serializers import BillSerializer, DetailBillSerializer, ListBillSerializer, PrintBillSerializer, SumMoneyBillSerializer, SaveConsumptionSerializer, LossSerializer
+from .models import BillModel, DetailBillModel, DatabaseListBill, PrintBill, SumMoneyBill
+from .serializers import BillSerializer, DetailBillSerializer, ListBillSerializer, PrintBillSerializer, SumMoneyBillSerializer
 from rest_framework.views import APIView
-from comsum.models import getLossModel
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import connection
@@ -150,41 +149,3 @@ class SumBill(APIView):
         }
         return Response(response, status=status.HTTP_200_OK)
 
-class ConsumptionView(APIView):
-    def post(self, request):
-        con=SaveConsumption.objects.raw("""select material_id, DF.amount_material*BD.amount as "sum_material"
-                                            from food_table_manager_detailfoodmodel DF,
-                                            (select food_id_id, sum(BD.amount) as "amount"
-                                            from order_billmodel B, order_detailbillmodel BD
-                                            where BD.bill_id_id=B.id and time_created::date=current_date
-                                            group by BD.food_id_id) BD where BD.food_id_id=DF.food_id""")
-
-        serializer=SaveConsumptionSerializer(con, many=True)
-        for data in serializer.data:
-            with connection.cursor() as cursor:
-                    cursor.execute(f"insert into order_consumptionmodel(amount_consumption, time_consumption, material_id) values ({data['sum_material']}, current_date, {data['material_id']})")
-        response = {
-            "success": "success",
-            "status_code": status.HTTP_200_OK
-        }
-        return Response(response, status=status.HTTP_200_OK)
-
-class LossView(APIView):
-    def post(self, request):
-        con=getLossModel.objects.raw("""select material_id as material_id, (material_digital-material_reality) as "loss"
-            from order_warehouse""")
-        serializer=LossSerializer(con, many=True)
-        for data in serializer.data:
-            with connection.cursor() as cursor:
-                    cursor.execute(f"insert into comsum_lossmodel(amount_loss, time, material_id) values({data['loss']}, current_date, {data['material_id']})")
-        response = {
-            "success": "success",
-            "status_code": status.HTTP_200_OK
-        }
-        return Response(response, status=status.HTTP_200_OK)
-
-class InsertWareHouse(APIView):
-    def post(self, request):
-        material_realize=request.data['material_reality']
-        
-        pass

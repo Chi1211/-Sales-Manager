@@ -36,22 +36,4 @@ class PrintBill(models.Model):
 class SumMoneyBill(models.Model):
     sum=models.IntegerField(primary_key=True)
 
-class ConsumptionModel(models.Model):
-    material=models.ForeignKey(MaterialModel, on_delete=models.CASCADE)
-    amount_consumption=models.IntegerField()
-    # amount_consumption_lost=models.IntegerField(default=0)
-    time_consumption=models.DateField()
 
-class SaveConsumption(models.Model):
-    material_id=models.IntegerField(primary_key=True)
-    sum_material=models.IntegerField()
-
-class WareHouse(models.Model):
-    material=models.ForeignKey(MaterialModel, on_delete=models.CASCADE)
-    material_digital=models.IntegerField(default=0)
-    material_reality=models.IntegerField(default=material_digital)
-
-class LossModel(models.Model):
-    mater=models.IntegerField()
-    material_loss=models.IntegerField()
-    time_update=models.DateField(auto_now=True)
