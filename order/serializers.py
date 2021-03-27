@@ -24,6 +24,6 @@ class PrintBillSerializer(serializers.ModelSerializer):
 class SumMoneyBillSerializer(serializers.ModelSerializer):
     class Meta:
         model=SumMoneyBill
-        fields='__all__'
+        fields=['id_sum','total']
 
 

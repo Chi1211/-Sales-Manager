@@ -3,8 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import connection
-from .models import LossModel, getLossModel, ConsumptionModel, SaveConsumption, WareHouse, StatisticalModel
-from .serializers import SaveConsumptionSerializer, WareHouseSerializer, LossModelSerializer, LossSerializer, StatisticalSerializer
+from .models import LossModel, getLossModel, ConsumptionModel, SaveConsumption, WareHouse, StatisticalModel, ConsumpFoodModel
+from .serializers import SaveConsumptionSerializer, WareHouseSerializer, LossModelSerializer, LossSerializer, StatisticalSerializer, ConsumpFoodSerializer
 # Create your views here.
 class ConsumptionView(APIView):
     def post(self, request):
@@ -93,3 +93,21 @@ class StatisticalView(APIView):
         }
         return Response(response, status=status.HTTP_200_OK)
 
+class ConsumpFood(APIView):
+    def get(self, request):
+        todate=request.data["todate"]
+        fromdate=request.data["fromdate"]
+        food=ConsumpFoodModel.objects.raw(f"""select F.id as "food_id", F.food_name, F.food_price
+            from food_table_manager_foodmodel F, 
+            (select BD.food_id_id as "food_id", sum(BD.amount) as "amount"
+            from order_billmodel B, order_detailbillmodel BD
+            where BD.bill_id_id=B.id and time_created::date<('{todate}'::date+'1 day'::interval) and time_created::date>='{fromdate}'
+            group by BD.food_id_id) B
+            where B.food_id=F.id
+            ORDER BY B.amount DESC""")
+        serializer=ConsumpFoodSerializer(food, many=True)
+        response = {
+            "data": serializer.data,
+            "status_code": status.HTTP_200_OK
+        }
+        return Response(response, status=status.HTTP_200_OK)

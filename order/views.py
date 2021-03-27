@@ -141,10 +141,23 @@ class PrintBillView(APIView):
 
 class SumBill(APIView):
     def get(self, request, pk):
-        total1 = SumMoneyBill.objects.raw(f"""select sum(price*amount) as "sum"  from order_billmodel B, order_detailbillmodel DB where DB.bill_id_id=B.id and B.id={pk}""")
-        serializer = SumMoneyBillSerializer(total1)
+        # total1 = SumMoneyBill.objects.raw(f'select 1 as "id_sum", sum(price*amount) as "total"  from order_billmodel B, order_detailbillmodel DB where DB.bill_id_id=B.id and B.id={pk}')
+        # print(total1, "AAA")
+        # serializer = SumMoneyBillSerializer(total1)
+        # print(serializer.data, "AAA")
+        # response = {
+        #     "data": serializer.data,
+        #     "status_code": status.HTTP_200_OK
+        # }
+        # return Response(response, status=status.HTTP_200_OK)
+        total1=DetailBillModel.objects.filter(bill_id=pk)
+        serializer=DetailBillSerializer(total1, many=True)
+        sum=0
+        for data in serializer.data:
+            print(type(sum), type(data['price']), "AAA")
+            sum+=data['amount']*int(data['price'])
         response = {
-            "data": serializer.data,
+            "sum": sum,
             "status_code": status.HTTP_200_OK
         }
         return Response(response, status=status.HTTP_200_OK)

@@ -29,3 +29,8 @@ class StatisticalModel(models.Model):
     material_name=models.CharField(max_length=255)
     material_digital=models.IntegerField()
     material_reality=models.IntegerField()
+
+class ConsumpFoodModel(models.Model):
+    food_id=models.IntegerField(primary_key=True)
+    food_name=models.CharField(max_length=255)
+    food_price=models.IntegerField()
