@@ -13,7 +13,6 @@ class getLossModel(models.Model):
 class ConsumptionModel(models.Model):
     material=models.ForeignKey(MaterialModel, on_delete=models.CASCADE)
     amount_consumption=models.IntegerField()
-    # amount_consumption_lost=models.IntegerField(default=0)
     time_consumption=models.DateField()
 
 class SaveConsumption(models.Model):

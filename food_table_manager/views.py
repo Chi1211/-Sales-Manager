@@ -61,7 +61,7 @@ class UpdateCategoriesView(APIView):
 class SearchCategoriesView(APIView):
     def get(self, request):
         name=request.data["category_name"]
-        categories=CategoriesModel.objects.filter(category_name__contains=name)
+        categories=CategoriesModel.objects.filter(category_name__icontains=name)
         serializer = CategoriesSerializer(categories, many=True)
         response={
             "data": serializer.data,
@@ -80,7 +80,7 @@ class getFoodView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class getCategoryFoodView(APIView):
-    def get(self, request, category ):
+    def get(self, request, category):
         food=GetFoodModel.objects.raw("select F.id, F.food_name, F.food_price, F.food_image from food_table_manager_foodmodel F inner join food_table_manager_categoriesmodel Ca on F.category_id=Ca.id where Ca.category_name='"+category+"'")
         serializer = GetFoodSerializer(food, many=True)
         response={
@@ -243,8 +243,7 @@ class UpdateTableView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class SearchTableView(APIView):
-    def get(self, request):
-        statuss=request.data["status"]
+    def get(self, request, statuss):
         table=TableModel.objects.filter(status=statuss)
         serializer = TableSerializer(table, many=True)
         response={
@@ -254,16 +253,16 @@ class SearchTableView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class BookTableView(APIView):    
-    def get(self, request):
-        book=BookTableModel.objects.all()
-        serializer = BookTableSerializer(book, many=True)
-        response={
-            "data": serializer.data,
-            "status_code": status.HTTP_200_OK,
-        }
-        return Response(response, status=status.HTTP_200_OK)
-    def post(self, request):
-        table=request.data['table']
+    # def get(self, request):
+    #     book=BookTableModel.objects.all()
+    #     serializer = BookTableSerializer(book, many=True)
+    #     response={
+    #         "data": serializer.data,
+    #         "status_code": status.HTTP_200_OK,
+    #     }
+    #     return Response(response, status=status.HTTP_200_OK)
+    def post(self, request, table):
+        # table=request.data['table']
         with connection.cursor() as cursor:
             cursor.execute(f"update food_table_manager_tablemodel set status='Bàn đã đặt' where id={table}")
         serializer=BookTableSerializer(data=request.data)

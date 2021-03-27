@@ -14,10 +14,15 @@ class ConsumptionView(APIView):
             from order_billmodel B, order_detailbillmodel BD
             where BD.bill_id_id=B.id and time_created::date=current_date
             group by BD.food_id_id) BD where BD.food_id_id=DF.food_id group by material_id""")
-
         serializer=SaveConsumptionSerializer(con, many=True)
-        for data in serializer.data:
-            with connection.cursor() as cursor:
+        consump=ConsumptionModel.objects.raw("""select * from comsum_consumptionmodel where time_consumption::date=current_date""")
+        if consump: 
+            for data in serializer.data:
+                with connection.cursor() as cursor:
+                    cursor.execute(f"update comsum_consumptionmodel set amount_consumption={data['sum_material']} where material_id={data['material_id']}")
+        else: 
+            for data in serializer.data:
+                with connection.cursor() as cursor:
                     cursor.execute(f"insert into comsum_consumptionmodel(amount_consumption, time_consumption, material_id) values ({data['sum_material']}, current_date, {data['material_id']})")
         response = {
             "success": "success",
@@ -59,10 +64,10 @@ class InsertWareHouse(APIView):
 
         # consumption material_loss
         con=getLossModel.objects.raw("""select N.material_id_id as "material_id",(coalesce(N.nhap , 0)-coalesce(L.bloss , 0)-coalesce( Ti.tieuthu , 0)-coalesce(Co.material_reality , 0)) as "loss"
-from (select material_id_id, sum(amount) as "nhap" from material_importmaterialmodel group by material_id_id) N
-Left JOIN  (select material_id, sum(amount_loss) as "bloss" from comsum_lossmodel group by material_id) L on N.material_id_id=L.material_id
-Left JOIN  (select material_id, sum(amount_consumption) as "tieuthu" from comsum_consumptionmodel group by material_id) Ti on N.material_id_id=Ti.material_id
-Left join comsum_warehouse Co on Co.id=N.material_id_id""")
+    from (select material_id_id, sum(amount) as "nhap" from material_importmaterialmodel group by material_id_id) N
+    Left JOIN  (select material_id, sum(amount_loss) as "bloss" from comsum_lossmodel group by material_id) L on N.material_id_id=L.material_id
+    Left JOIN  (select material_id, sum(amount_consumption) as "tieuthu" from comsum_consumptionmodel group by material_id) Ti on N.material_id_id=Ti.material_id
+    Left join comsum_warehouse Co on Co.id=N.material_id_id""")
         serializer=LossSerializer(con, many=True)
         for data in serializer.data:
             with connection.cursor() as cursor:
@@ -75,12 +80,12 @@ Left join comsum_warehouse Co on Co.id=N.material_id_id""")
 
 class StatisticalView(APIView):
     def get(self, request):
-        statis= StatisticalModel.objects.raw("""select N.material_id_id as "material_id", Ma.material_name as "material_name",(coalesce(N.nhap , 0)-coalesce(L.bloss , 0)) as "material_digital", Co.material_reality as "material_reality"
-from (select material_id_id, sum(amount) as "nhap" from material_importmaterialmodel group by material_id_id) N
-Left JOIN  (select material_id, sum(amount_loss) as "bloss" from comsum_lossmodel group by material_id) L on N.material_id_id=L.material_id
-Left JOIN  (select material_id, sum(amount_consumption) as "tieuthu" from comsum_consumptionmodel group by material_id) Ti on N.material_id_id=Ti.material_id
-Left join comsum_warehouse Co on Co.id=N.material_id_id
-inner join material_materialmodel Ma on N.material_id_id=Ma.id""")
+        statis= StatisticalModel.objects.raw("""select N.material_id_id as "material_id", Ma.material_name as "material_name",(coalesce(N.nhap , 0)-coalesce(L.bloss , 0)-coalesce(Ti.tieuthu , 0)) as "material_digital", Co.material_reality as "material_reality"
+    from (select material_id_id, sum(amount) as "nhap" from material_importmaterialmodel group by material_id_id) N
+    Left JOIN  (select material_id, sum(amount_loss) as "bloss" from comsum_lossmodel group by material_id) L on N.material_id_id=L.material_id
+    Left JOIN  (select material_id, sum(amount_consumption) as "tieuthu" from comsum_consumptionmodel group by material_id) Ti on N.material_id_id=Ti.material_id
+    Left join comsum_warehouse Co on Co.id=N.material_id_id
+    inner join material_materialmodel Ma on N.material_id_id=Ma.id""")
         serializer=StatisticalSerializer(statis, many=True)
         response = {
             "data": serializer.data,

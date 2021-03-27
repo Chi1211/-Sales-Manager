@@ -66,7 +66,7 @@ class UpdateMaterialView(APIView):
 class SearchMaterialView(APIView):
     def get(self, request):
         name=request.data["material_name"]
-        material=MaterialModel.objects.filter(material_name__contains=name)
+        material=MaterialModel.objects.filter(material_name__icontains=name)
         serializer = MaterialSerializer(material, many=True)
         response={
             "data": serializer.data,

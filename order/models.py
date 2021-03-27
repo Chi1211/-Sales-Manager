@@ -17,7 +17,7 @@ class DetailBillModel(models.Model):
     bill_id=models.ForeignKey(BillModel, on_delete=models.CASCADE)
     food_id=models.ForeignKey(FoodModel, on_delete=models.CASCADE)
     amount=models.IntegerField(default=1)
-    price=models.DecimalField(max_digits=19, decimal_places=0)
+    price=models.DecimalField(max_digits=19, decimal_places=3)
 
 class DatabaseListBill(models.Model):
     bill_id = models.IntegerField(primary_key=True)
@@ -34,6 +34,6 @@ class PrintBill(models.Model):
     total_price = models.IntegerField()
     
 class SumMoneyBill(models.Model):
-    sum=models.IntegerField(primary_key=True)
+    sum=models.IntegerField()
 
 
