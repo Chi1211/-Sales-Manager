@@ -67,7 +67,7 @@ class UpdateSupplierView(APIView):
 
 class SearchSupplierView(APIView):
     permission_classes=(IsAuthenticated,IsAdminUser, )
-    def get(self, request):
+    def post(self, request):
         name=request.data["supplier_name"]
         supplier=SupplierModel.objects.filter(supplier_name__icontains=name)
         serializer = SupplierSerialier(supplier, many=True)

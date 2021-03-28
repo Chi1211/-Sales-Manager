@@ -59,7 +59,7 @@ class UpdateCategoriesView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class SearchCategoriesView(APIView):
-    def get(self, request):
+    def post(self, request):
         name=request.data["category_name"]
         categories=CategoriesModel.objects.filter(category_name__icontains=name)
         serializer = CategoriesSerializer(categories, many=True)
@@ -196,7 +196,7 @@ class UpdateDetailFooView(APIView):
 
 class getTableView(APIView):
     def get(self, request):
-        table=TableModel.objects.all()
+        table=TableModel.objects.raw("select * from food_table_manager_tablemodel where status <>'Tạm ngưng hoạt động'")
         serializer = TableSerializer(table, many=True)
         response={
             "data": serializer.data,

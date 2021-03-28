@@ -64,7 +64,7 @@ class UpdateMaterialView(APIView):
         return Response(response, status=status.HTTP_200_OK)   
 
 class SearchMaterialView(APIView):
-    def get(self, request):
+    def post(self, request):
         name=request.data["material_name"]
         material=MaterialModel.objects.filter(material_name__icontains=name)
         serializer = MaterialSerializer(material, many=True)
@@ -102,7 +102,7 @@ class CreateImportMaterialView(APIView):
         return Response(response, status=status.HTTP_201_CREATED)
 
 class SearchImportMaterialNameView(APIView):
-    def get(self, request):
+    def post(self, request):
         name=request.data["material_name"]
         
         import_material=GetImportMaterialModel.objects.raw("select I.id, Ma.material_name, S.supplier_name, I.amount, I.price, I.import_date from material_importmaterialmodel I inner join material_materialmodel Ma on Ma.id=I.material_id_id inner join supplier_suppliermodel S on S.id=I.supplier_id_id where Ma.material_name like '%%"+name+"%%'")
@@ -114,7 +114,7 @@ class SearchImportMaterialNameView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class SearchImportMaterialDateView(APIView):
-    def get(self, request):
+    def post(self, request):
         from_date=request.data["from_date"]
         to_date=request.data["to_date"]
         import_material=GetImportMaterialModel.objects.raw("select I.id, Ma.material_name, S.supplier_name, I.amount, I.price, I.import_date from material_importmaterialmodel I inner join material_materialmodel Ma on Ma.id=I.material_id_id inner join supplier_suppliermodel S on S.id=I.supplier_id_id where I.import_date BETWEEN '"+ from_date +"' AND '"+to_date+"'")

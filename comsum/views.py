@@ -94,7 +94,7 @@ class StatisticalView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class ConsumpFood(APIView):
-    def get(self, request):
+    def post(self, request):
         todate=request.data["todate"]
         fromdate=request.data["fromdate"]
         food=ConsumpFoodModel.objects.raw(f"""select F.id as "food_id", F.food_name, F.food_price
@@ -104,7 +104,8 @@ class ConsumpFood(APIView):
             where BD.bill_id_id=B.id and time_created::date<('{todate}'::date+'1 day'::interval) and time_created::date>='{fromdate}'
             group by BD.food_id_id) B
             where B.food_id=F.id
-            ORDER BY B.amount DESC""")
+            ORDER BY B.amount DESC
+            LIMIT 10 """)
         serializer=ConsumpFoodSerializer(food, many=True)
         response = {
             "data": serializer.data,
