@@ -3,8 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import connection
-from .models import LossModel, getLossModel, ConsumptionModel, SaveConsumption, WareHouse, StatisticalModel, ConsumpFoodModel
-from .serializers import SaveConsumptionSerializer, WareHouseSerializer, LossModelSerializer, LossSerializer, StatisticalSerializer, ConsumpFoodSerializer
+from .models import LossModel, getLossModel, ConsumptionModel, SaveConsumption, WareHouse, StatisticalModel, ConsumpFoodModel, GetStatistics, General
+from .serializers import SaveConsumptionSerializer, WareHouseSerializer, LossModelSerializer, LossSerializer, StatisticalSerializer, ConsumpFoodSerializer, StatisticsSerializer, GeneralaaSerializer
 # Create your views here.
 class ConsumptionView(APIView):
     def post(self, request):
@@ -107,6 +107,32 @@ class ConsumpFood(APIView):
             ORDER BY B.amount DESC
             LIMIT 10 """)
         serializer=ConsumpFoodSerializer(food, many=True)
+        response = {
+            "data": serializer.data,
+            "status_code": status.HTTP_200_OK
+        }
+        return Response(response, status=status.HTTP_200_OK)
+
+class StatisticsMonthView(APIView):   
+    def get(self, request):
+        data = GetStatistics.objects.raw("""SELECT to_char(B.time_created, 'MM') as "month", SUM(amount*price) AS total
+FROM order_billmodel B, order_detailbillmodel BD
+WHERE B.id = BD.bill_id_id AND to_char(B.time_created, 'YYYY') = to_char(NOW(), 'YYYY')
+GROUP BY 1""")
+        serializer = StatisticsSerializer(data, many=True)
+        response = {
+            "data": serializer.data,
+            "status_code": status.HTTP_200_OK
+        }
+        return Response(response, status=status.HTTP_200_OK)
+
+class GeneralaaView(APIView):    
+    def get(self, request):
+        data = General.objects.raw("""SELECT SUM(BD.amount) AS amount , SUM(BD.amount*BD.price) AS revenue
+FROM order_billmodel B, order_detailbillmodel BD
+WHERE B.id = BD.bill_id_id 
+	AND date_part('year', B.time_created) >= (SELECT date_part('year',NOW()) - 1)""")
+        serializer = GeneralaaSerializer(data, many=True)
         response = {
             "data": serializer.data,
             "status_code": status.HTTP_200_OK

@@ -19,7 +19,7 @@ class getCategoriesView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class CreateCategoriesView(APIView):
-    permission_classes=(IsAuthenticated,IsAdminUser, )
+    # permission_classes=(IsAuthenticated,IsAdminUser, )
     def post(self, request):
         serializer=CategoriesSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -31,7 +31,7 @@ class CreateCategoriesView(APIView):
         return Response(response, status=status.HTTP_201_CREATED)
 
 class UpdateCategoriesView(APIView):
-    permission_classes=(IsAuthenticated, IsAdminUser)
+    # permission_classes=(IsAuthenticated, IsAdminUser)
     def get_object(self, pk):
         try: 
             categories=CategoriesModel.objects.get(pk=pk)

@@ -33,4 +33,12 @@ class StatisticalModel(models.Model):
 class ConsumpFoodModel(models.Model):
     food_id=models.IntegerField(primary_key=True)
     food_name=models.CharField(max_length=255)
-    food_price=models.IntegerField()
+    food_price=models.IntegerField(default=1)
+
+class GetStatistics(models.Model):
+    month = models.IntegerField(primary_key=True)
+    total = models.IntegerField()
+
+class General(models.Model):
+    amount = models.IntegerField(primary_key=True)
+    revenue = models.IntegerField()

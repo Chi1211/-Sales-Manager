@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'food_table_manager',
     'order',
     'comsum',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -56,10 +57,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware', 
+    'django.middleware.security.SecurityMiddleware', 
+    'django.contrib.sessions.middleware.SessionMiddleware',    
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'FoodManager.urls'
-
+CORS_ORIGIN_ALLOW_ALL = True
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -142,10 +147,12 @@ AUTH_USER_MODEL='authentication.User'
 
 REST_FRAMEWORK={
     "DEFAULT_PERMISSION_CLASSES":
-        ["rest_framework.permissions.IsAuthenticated",],                          
-    "DEFAULT_AUTHENTICATION_CLASSES": [  
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ],              
+         ["rest_framework.permissions.AllowAny",], 
+    # "DEFAULT_PERMISSION_CLASSES":
+    #     ["rest_framework.permissions.IsAuthenticated",],                          
+    # "DEFAULT_AUTHENTICATION_CLASSES": [  
+    #     "rest_framework_simplejwt.authentication.JWTAuthentication",
+    # ],              
 }
 
 SIMPLE_JWT = {
