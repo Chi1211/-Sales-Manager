@@ -36,7 +36,7 @@ class BookTableModel(models.Model):
 class DetailFoodModel(models.Model):
     food= models.ForeignKey(FoodModel, on_delete=models.CASCADE)
     material=models.ForeignKey(MaterialModel, on_delete=models.CASCADE)
-    amount_material=models.IntegerField(default=1)
+    amount_material=models.IntegerField()
 
 class getDetailFoodModel(models.Model):
     id=models.IntegerField(primary_key=True)

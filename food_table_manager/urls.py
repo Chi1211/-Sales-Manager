@@ -15,7 +15,7 @@ urlpatterns=[
     path('detail_food/<int:pk>', views.UpdateFoodView.as_view()),
     path('create_detailfood/', views.CreateDetailFoodView.as_view()),
     path('get_detailfood/<int:pk>', views.getDetailFoodView.as_view()),
-    path('detail_detailfood/<int:pk>', views.UpdateDetailFooView.as_view()),
-    path('book_table/<str:table>', views.BookTableView.as_view()),
+    path('delete_detailfood/<int:pk>', views.UpdateDetailFoodView.as_view()),
+    path('book_table/', views.BookTableView.as_view()),
     path('update_book_table/<int:pk>', views.UpdateBookTableView.as_view()),
 ]
