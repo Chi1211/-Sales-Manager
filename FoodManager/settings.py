@@ -90,9 +90,9 @@ WSGI_APPLICATION = 'FoodManager.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'MiniStore',
+        'NAME': 'MiniStore1',
         'USER': 'postgres',
-        'PASSWORD': 'bichchi344',
+        'PASSWORD': 'Kien123vn',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -148,11 +148,13 @@ AUTH_USER_MODEL='authentication.User'
 REST_FRAMEWORK={
     "DEFAULT_PERMISSION_CLASSES":
          ["rest_framework.permissions.AllowAny",], 
+    "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",
     # "DEFAULT_PERMISSION_CLASSES":
     #     ["rest_framework.permissions.IsAuthenticated",],                          
     # "DEFAULT_AUTHENTICATION_CLASSES": [  
     #     "rest_framework_simplejwt.authentication.JWTAuthentication",
-    # ],              
+    # ],
+
 }
 
 SIMPLE_JWT = {
