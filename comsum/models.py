@@ -42,3 +42,12 @@ class GetStatistics(models.Model):
 class General(models.Model):
     amount = models.IntegerField(primary_key=True)
     revenue = models.IntegerField()
+
+class GetWareHouse(models.Model):
+    id=models.IntegerField(primary_key=True)
+    material_name=models.CharField(max_length=255)
+    material_reality=models.IntegerField()
+
+class DateOfWare(models.Model):
+    id=models.IntegerField(primary_key=True)
+    date=models.DateField()

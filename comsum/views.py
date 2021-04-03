@@ -3,8 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import connection
-from .models import LossModel, getLossModel, ConsumptionModel, SaveConsumption, WareHouse, StatisticalModel, ConsumpFoodModel, GetStatistics, General
-from .serializers import SaveConsumptionSerializer, WareHouseSerializer, LossModelSerializer, LossSerializer, StatisticalSerializer, ConsumpFoodSerializer, StatisticsSerializer, GeneralaaSerializer
+from .models import LossModel, getLossModel, ConsumptionModel, SaveConsumption, WareHouse, StatisticalModel, ConsumpFoodModel, GetStatistics, General, GetWareHouse, DateOfWare
+from .serializers import SaveConsumptionSerializer, WareHouseSerializer, LossModelSerializer, LossSerializer, StatisticalSerializer, ConsumpFoodSerializer, StatisticsSerializer, GeneralaaSerializer, GetWareHouseSerializer, DateOfWareSerializer
 # Create your views here.
 class ConsumptionView(APIView):
     def post(self, request):
@@ -48,19 +48,27 @@ class ConsumptionView(APIView):
 #         return Response(response, status=status.HTTP_200_OK)
 
 class InsertWareHouse(APIView):
+    def get(self, request):
+        ware= GetWareHouse.objects.raw("""select W.id, Ma.material_name, W.material_reality  from comsum_warehouse W, material_materialmodel Ma where Ma.id=W.material_id""")
+        serializer=GetWareHouseSerializer(ware, many=True)
+        response = {
+            "data": serializer.data,
+            "status_code": status.HTTP_200_OK
+        }
+        return Response(response, status=status.HTTP_200_OK)
     def post(self, request):
         # save ware
-        datas = request.data['data']
-        for data in datas:
-            material=data['material']
-            material_reality=data['material_reality']
-            ware=WareHouse.objects.raw(f"select * from comsum_warehouse where material_id={material}")
-            if ware: 
-                with connection.cursor() as cursor:
-                    cursor.execute(f"update comsum_warehouse set material_reality={material_reality}, created=current_date where material_id={material}")
-            else: 
-                with connection.cursor() as cursor:
-                    cursor.execute(f"INSERT INTO comsum_warehouse(material_reality, created, material_id) VALUES({material_reality}, current_date,{material})")
+        # datas = request.data['data']
+        # for data in datas:
+        material=request.data['material']
+        material_reality=request.data['material_reality']
+        ware=WareHouse.objects.raw(f"select * from comsum_warehouse where material_id={material}")
+        if ware: 
+            with connection.cursor() as cursor:
+                cursor.execute(f"update comsum_warehouse set material_reality={material_reality}, created=current_date where material_id={material}")
+        else: 
+            with connection.cursor() as cursor:
+                cursor.execute(f"INSERT INTO comsum_warehouse(material_reality, created, material_id) VALUES({material_reality}, current_date,{material})")
 
         # consumption material_loss
         con=getLossModel.objects.raw("""select N.material_id_id as "material_id",(coalesce(N.nhap , 0)-coalesce(L.bloss , 0)-coalesce( Ti.tieuthu , 0)-coalesce(Co.material_reality , 0)) as "loss"
@@ -80,13 +88,23 @@ class InsertWareHouse(APIView):
 
 class StatisticalView(APIView):
     def get(self, request):
-        statis= StatisticalModel.objects.raw("""select N.material_id_id as "material_id", Ma.material_name as "material_name",(coalesce(N.nhap , 0)-coalesce(L.bloss , 0)-coalesce(Ti.tieuthu , 0)) as "material_digital", Co.material_reality as "material_reality"
+        statis= StatisticalModel.objects.raw("""select N.material_id_id as "material_id", Ma.material_name as "material_name",(coalesce(N.nhap , 0)-coalesce(L.bloss , 0)-coalesce(Ti.tieuthu , 0)) as "material_digital",coalesce(Co.material_reality , 0)  as "material_reality"
     from (select material_id_id, sum(amount) as "nhap" from material_importmaterialmodel group by material_id_id) N
     Left JOIN  (select material_id, sum(amount_loss) as "bloss" from comsum_lossmodel group by material_id) L on N.material_id_id=L.material_id
     Left JOIN  (select material_id, sum(amount_consumption) as "tieuthu" from comsum_consumptionmodel group by material_id) Ti on N.material_id_id=Ti.material_id
     Left join comsum_warehouse Co on Co.id=N.material_id_id
     inner join material_materialmodel Ma on N.material_id_id=Ma.id""")
         serializer=StatisticalSerializer(statis, many=True)
+        response = {
+            "data": serializer.data,
+            "status_code": status.HTTP_200_OK
+        }
+        return Response(response, status=status.HTTP_200_OK)
+
+class DateOfWareView(APIView):
+    def get(self, request):
+        date= DateOfWare.objects.raw("""select 1 as "id", max(created) as "date" from comsum_warehouse""")
+        serializer=DateOfWareSerializer(date, many=True)
         response = {
             "data": serializer.data,
             "status_code": status.HTTP_200_OK

@@ -159,25 +159,32 @@ class getDetailFoodView(APIView):
         return Response(response, status=200)
 
 class CreateDetailFoodView(APIView):
-    def post(self, request):
-        try:
-            datas = request.data['data']
-        except:
-            return Response({'errors':'errors'}, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request):
+        detail_food=getDetailFoodModel.objects.raw('select D.id, Ma.material_name, D.amount_material from food_table_manager_detailfoodmodel D inner join material_materialmodel Ma on Ma.id=D.material_id inner join food_table_manager_foodmodel F on F.id=D.food_id where D.food_id=(select max(id) from food_table_manager_foodmodel)')
+        serializer = getDetailFoodSerializer(detail_food, many=True)
+        response={
+            "data": serializer.data,
+            "status_code": status.HTTP_200_OK,
+        }
+        return Response(response, status=status.HTTP_200_OK)
 
-        for data in datas:
-            food_id=FoodModel.objects.all().aggregate(Max('id'))
-            print(food_id, "AAA")
-            serializer=DetailFoodSerializer(data=data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save(food_id=food_id['id__max'])
+    def post(self, request):
+        data=request.data
+        food_id=FoodModel.objects.all().aggregate(Max('id'))
+        detail= DetailFoodModel.objects.filter(material=data['material'], food=food_id['id__max'])
+        if detail:
+            detail.update(amount_material= data['amount_material'])
+            # detail_food= DetailFoodModel.objects.update(material=data['material'], food=pk, amount_material= data['amount_material'])               
+        else: 
+            DetailFoodModel.objects.create(material_id=data['material'], food_id=food_id['id__max'], amount_material= data['amount_material'])
+            # print(food_id, "AAA")
         response={
            'success': 'success',
            'status_code': status.HTTP_201_CREATED
         }
         return Response(response, status=status.HTTP_201_CREATED)
 
-class UpdateDetailFooView(APIView):
+class UpdateDetailFoodView(APIView):
     def get_object(self, pk):
         try: 
             detail_food=DetailFoodModel.objects.get(pk=pk)
@@ -185,7 +192,7 @@ class UpdateDetailFooView(APIView):
         except DetailFoodModel.DoesNotExist:
             return Response({"errors":"errors"}, status=404)
 
-    def delete(self,request,  pk):
+    def delete(self,request,pk):
         detail_food=self.get_object(pk)
         detail_food.delete()
         response={
@@ -261,8 +268,8 @@ class BookTableView(APIView):
     #         "status_code": status.HTTP_200_OK,
     #     }
     #     return Response(response, status=status.HTTP_200_OK)
-    def post(self, request, table):
-        # table=request.data['table']
+    def post(self, request):
+        table=request.data['table']
         with connection.cursor() as cursor:
             cursor.execute(f"update food_table_manager_tablemodel set status='Bàn đã đặt' where id={table}")
         serializer=BookTableSerializer(data=request.data)
@@ -280,10 +287,15 @@ class UpdateBookTableView(APIView):
             # book=BookTableModel.objects.raw("select id, table_id as table, time_book, name_book, phone_book, number_of_people, money_book from food_table_manager_booktablemodel where id=(select max(id) from food_table_manager_booktablemodel where table_id="+str(pk)+")")
             # print(book, 'AAA')
             book=BookTableModel.objects.filter(table=pk).aggregate(Max('id'))
-            detail_book=BookTableModel.objects.get(pk=book['id__max'])
+            if book:
+
+ 
+                detail_book=BookTableModel.objects.get(pk=book['id__max'])
+            
             # detail_book=BookTableModel.objects.get(pk=pk)
-            print(book, 'AAA')
-            return detail_book
+                print(book, 'AAA')
+                return detail_book
+            else: return Response({"errors":"errors"}, status=404)
         except BookTableModel.DoesNotExist:
             return Response({"errors":"errors"}, status=404)
     def get(self, request, pk):
