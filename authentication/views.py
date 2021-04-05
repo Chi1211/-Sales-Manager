@@ -35,6 +35,8 @@ class LoginView(APIView):
         respone={
             "id":user.id,
             "username":user.username,
+            "superuser":user.is_superuser,
+            "admin":user.is_staff,
             "status_code": 200,
             "token": str(access)
             
@@ -77,19 +79,19 @@ class ChangePasswordView(APIView):
         return Response(serializer.errors, status=400)
 
 class ChangeProfileView(APIView):
-    def get(self, request):
-        username=request.user.username
+    def get(self, request, username):
+        # username=request.data['username']
         user=User.objects.get(username=username)  
         serializer=ChangeProfileSerializer(user)
         if serializer:
             response={
-                "user":serializer.data,
+                "data":serializer.data,
                 "status_code": 200
             }
             return Response(response, status=200)
         return Response({"detai":"error"}, status=400)
-    def put(self, request):
-        username=request.user.username
+    def put(self, request, username):
+        # username=request.data['username']
         user=User.objects.get(username=username)
         serializer=ChangeProfileSerializer(user, data=request.data)
         if serializer.is_valid():
