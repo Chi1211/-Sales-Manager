@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SaveConsumption, WareHouse, getLossModel, LossModel, StatisticalModel, ConsumpFoodModel, GetStatistics, General, GetWareHouse, DateOfWare
+from .models import SaveConsumption, WareHouse, getLossModel, LossModel, StatisticalModel, ConsumpFoodModel, GetStatistics, General, GetWareHouse, DateOfWare, ChartProduct
 class SaveConsumptionSerializer(serializers.ModelSerializer):
     class Meta: 
         model=SaveConsumption
@@ -49,4 +49,9 @@ class GetWareHouseSerializer(serializers.ModelSerializer):
 class DateOfWareSerializer(serializers.ModelSerializer):
     class Meta:
         model = DateOfWare
+        fields = '__all__'
+
+class ChartProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChartProduct
         fields = '__all__'

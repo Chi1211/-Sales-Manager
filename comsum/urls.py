@@ -7,5 +7,10 @@ urlpatterns=[
     path('load_date_ware/', views.DateOfWareView.as_view()),
     path('consum_food/', views.ConsumpFood.as_view()),
     path('statis_month/', views.StatisticsMonthView.as_view()),
-    path('general/', views.GeneralaaView.as_view())
+    path('general/', views.GeneralaaView.as_view()),
+    path('chart_product/', views.ChartProductView.as_view())
+
+
+
+
 ]

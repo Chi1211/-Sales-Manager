@@ -7,7 +7,7 @@ from django.contrib.auth import login,logout
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+# from rest_framework.permissions import IsAuthenticated
 from .permissions import IsSuperUser
 # from django.contrib.auth.
 # Create your views here.
@@ -76,7 +76,7 @@ class ChangePasswordView(APIView):
                 'status_code':200
             }
             return Response(response, status=200)
-        return Response(serializer.errors, status=400)
+        return Response(serializer.errors, status=200)
 
 class ChangeProfileView(APIView):
     def get(self, request, username):
@@ -104,7 +104,7 @@ class ChangeProfileView(APIView):
         return Response(serializer.errors, status=400)
 
 class UserView(APIView):
-    permission_classes=(IsAuthenticated, IsSuperUser,)
+    # permission_classes=(IsSuperUser,)
     def get(self, request):
         user=User.objects.all()
         serializer = UserSerializer(user, many=True)
@@ -115,27 +115,27 @@ class UserView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class UpdateUserView(APIView):
-    permission_classes=(IsAuthenticated, IsSuperUser,)
-    def get(self, request):
-        username=request.data['username']
+    # permission_classes=(IsSuperUser,)
+    def get(self, request, username):
+        # username=request.data['username']
         user=User.objects.get(username=username)  
         serializer=UpdateUserSerializer(user)
         if serializer:
             response={
-                "user":serializer.data,
+                "data":serializer.data,
                 "status_code": 200
             }
             return Response(response, status=200)
         return Response({"detai":"error"}, status=400)
 
-    def put(self, request):
-        username=request.data['username']
+    def put(self, request, username):
+        # username=request.data['username']
         user=User.objects.get(username=username)
         serializer=UpdateUserSerializer(user, data=request.data)
         if serializer.is_valid():
             serializer.save()
             response={
-                "user":serializer.data,
+                "data":serializer.data,
                 "status_code": 200
             }
             return Response(response, status=200)

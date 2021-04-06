@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import MaterialSerializer, ImportMaterialSerializer, GetImportMaterialSerializer
-from .models import  MaterialModel, ImportMaterialModel, GetImportMaterialModel
+from .serializers import MaterialSerializer, ImportMaterialSerializer, GetImportMaterialSerializer, getSumSerializer
+from .models import  MaterialModel, ImportMaterialModel, GetImportMaterialModel, getSum
 from django.db import connection
 from django.db.models import Sum
 # Create your views here.
@@ -119,8 +119,11 @@ class SearchImportMaterialDateView(APIView):
         to_date=request.data["to_date"]
         import_material=GetImportMaterialModel.objects.raw("select I.id, Ma.material_name, S.supplier_name, I.amount, I.price, I.import_date from material_importmaterialmodel I inner join material_materialmodel Ma on Ma.id=I.material_id_id inner join supplier_suppliermodel S on S.id=I.supplier_id_id where I.import_date BETWEEN '"+ from_date +"' AND '"+to_date+"'")
         serializer = GetImportMaterialSerializer(import_material, many=True)
+        sum_price=getSum.objects.raw("select 1 as id, coalesce(sum(price), 0) as sum  from material_importmaterialmodel I inner join material_materialmodel Ma on Ma.id=I.material_id_id inner join supplier_suppliermodel S on S.id=I.supplier_id_id where I.import_date BETWEEN '"+ from_date +"' AND '"+to_date+"'")
+        serializer_sum = getSumSerializer(sum_price, many=True)
         response={
-            "data": serializer.data,
+            "data":serializer.data, 
+            "sumprice":serializer_sum.data,
             "status_code": status.HTTP_200_OK,
         }
         return Response(response, status=status.HTTP_200_OK)

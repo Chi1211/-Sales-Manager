@@ -3,8 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import connection
-from .models import LossModel, getLossModel, ConsumptionModel, SaveConsumption, WareHouse, StatisticalModel, ConsumpFoodModel, GetStatistics, General, GetWareHouse, DateOfWare
-from .serializers import SaveConsumptionSerializer, WareHouseSerializer, LossModelSerializer, LossSerializer, StatisticalSerializer, ConsumpFoodSerializer, StatisticsSerializer, GeneralaaSerializer, GetWareHouseSerializer, DateOfWareSerializer
+from datetime import date
+from .models import LossModel, getLossModel, ConsumptionModel, SaveConsumption, WareHouse, StatisticalModel, ConsumpFoodModel, GetStatistics, General, GetWareHouse, DateOfWare, ChartProduct
+from .serializers import SaveConsumptionSerializer, WareHouseSerializer, LossModelSerializer, LossSerializer, StatisticalSerializer, ConsumpFoodSerializer, StatisticsSerializer, GeneralaaSerializer, GetWareHouseSerializer, DateOfWareSerializer, ChartProductSerializer
 # Create your views here.
 class ConsumptionView(APIView):
     def post(self, request):
@@ -133,9 +134,18 @@ class ConsumpFood(APIView):
 
 class StatisticsMonthView(APIView):   
     def get(self, request):
-        data = GetStatistics.objects.raw("""SELECT to_char(B.time_created, 'MM') as "month", SUM(amount*price) AS total
+        month = date.today().month
+        if month < 6:
+            data = GetStatistics.objects.raw("""SELECT CAST(to_char(B.time_created, 'MM') AS INT) as "month", SUM(amount*price) AS total
 FROM order_billmodel B, order_detailbillmodel BD
-WHERE B.id = BD.bill_id_id AND to_char(B.time_created, 'YYYY') = to_char(NOW(), 'YYYY')
+WHERE B.id = BD.bill_id_id 
+	AND CAST(to_char(B.time_created, 'DD')|| to_char(B.time_created, 'MM')|| to_char(B.time_created, 'YYYY') AS INT) >= CAST('01'|| '0'||CAST((CAST(to_char(NOW(), 'MM')AS INT)+7) AS VARCHAR)|| (CAST(to_char(NOW(), 'YYYY')AS INT) - 1 ) AS INT)
+GROUP BY 1""")
+        else:
+            data = GetStatistics.objects.raw("""SELECT CAST(to_char(B.time_created, 'MM') AS INT) as "month", SUM(amount*price) AS total
+FROM order_billmodel B, order_detailbillmodel BD
+WHERE B.id = BD.bill_id_id 
+	AND CAST(to_char(B.time_created, 'DD')|| to_char(B.time_created, 'MM')|| to_char(B.time_created, 'YYYY') AS INT) >= CAST('01'|| '0'||CAST((CAST(to_char(NOW(), 'MM')AS INT) - 1) AS VARCHAR)|| to_char(NOW(), 'YYYY') AS INT)
 GROUP BY 1""")
         serializer = StatisticsSerializer(data, many=True)
         response = {
@@ -146,11 +156,42 @@ GROUP BY 1""")
 
 class GeneralaaView(APIView):    
     def get(self, request):
-        data = General.objects.raw("""SELECT SUM(BD.amount) AS amount , SUM(BD.amount*BD.price) AS revenue
+        month = date.today().month
+        if month > 1:
+            data = General.objects.raw("""SELECT SUM(BD.amount) AS amount , SUM(BD.amount*BD.price) AS revenue
 FROM order_billmodel B, order_detailbillmodel BD
 WHERE B.id = BD.bill_id_id 
-	AND date_part('year', B.time_created) >= (SELECT date_part('year',NOW()) - 1)""")
+	AND CAST(to_char(B.time_created, 'DD')|| to_char(B.time_created, 'MM')|| to_char(B.time_created, 'YYYY') AS INT) >= 
+	CAST('01'|| '0'||CAST((CAST(to_char(NOW(), 'MM')AS INT) - 1) AS VARCHAR)|| to_char(NOW(), 'YYYY') AS INT)""")
+        else:
+            data = General.objects.raw("""SELECT SUM(BD.amount) AS amount , SUM(BD.amount*BD.price) AS revenue
+FROM order_billmodel B, order_detailbillmodel BD
+WHERE B.id = BD.bill_id_id 
+	AND CAST(to_char(B.time_created, 'DD')|| to_char(B.time_created, 'MM')|| to_char(B.time_created, 'YYYY') AS INT) >= 
+	SELECT CAST('01'|| '0'||CAST((CAST(to_char(NOW(), 'MM')AS INT) + 11) AS VARCHAR)|| CAST((CAST(to_char(NOW(), 'YYYY')AS INT) - 1) AS VARCHAR) AS INT)""")
         serializer = GeneralaaSerializer(data, many=True)
+        response = {
+            "data": serializer.data,
+            "status_code": status.HTTP_200_OK
+        }
+        return Response(response, status=status.HTTP_200_OK)
+
+class ChartProductView(APIView):
+    def get(self, request):
+        month = date.today().month
+        if month < 6:
+            data = ChartProduct.objects.raw("""SELECT CAST(to_char(B.time_created, 'MM') AS INT) as "month", SUM(amount) AS total
+FROM order_billmodel B, order_detailbillmodel BD
+WHERE B.id = BD.bill_id_id 
+	AND CAST(to_char(B.time_created, 'DD')|| to_char(B.time_created, 'MM')|| to_char(B.time_created, 'YYYY') AS INT) >= CAST('01'|| '0'||CAST((CAST(to_char(NOW(), 'MM')AS INT)+7) AS VARCHAR)|| (CAST(to_char(NOW(), 'YYYY')AS INT) - 1 ) AS INT)
+GROUP BY 1""")
+        else:
+            data = ChartProduct.objects.raw("""SELECT CAST(to_char(B.time_created, 'MM') AS INT) as "month", SUM(amount) AS total
+FROM order_billmodel B, order_detailbillmodel BD
+WHERE B.id = BD.bill_id_id 
+	AND CAST(to_char(B.time_created, 'DD')|| to_char(B.time_created, 'MM')|| to_char(B.time_created, 'YYYY') AS INT) >= CAST('01'|| '0'||CAST((CAST(to_char(NOW(), 'MM')AS INT) - 1) AS VARCHAR)|| to_char(NOW(), 'YYYY') AS INT)
+GROUP BY 1""")
+        serializer = ChartProductSerializer(data, many=True)
         response = {
             "data": serializer.data,
             "status_code": status.HTTP_200_OK

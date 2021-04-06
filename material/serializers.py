@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MaterialModel, ImportMaterialModel, GetImportMaterialModel
+from .models import MaterialModel, ImportMaterialModel, GetImportMaterialModel, getSum
 
 
 class MaterialSerializer(serializers.ModelSerializer):
@@ -19,3 +19,8 @@ class GetImportMaterialSerializer(serializers.ModelSerializer):
         model=GetImportMaterialModel
         fields='__all__'
         ordering = ['import_date']
+
+class getSumSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model=getSum
+        fields='__all__'

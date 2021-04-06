@@ -94,12 +94,12 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
         confirm_password=validate_data.get('confirm_password', None)
         password_old=validate_data.get('password_old', None)        
         if password_old == password:
-            raise serializers.ValidationError({"detail": "the new password is the same as the old one"})
+            raise serializers.ValidationError({"data":{"message": "the new password is the same as the old one", "status_code":400}})
         user=authenticate(username=username, password=password_old)
         if not user:
-            raise serializers.ValidationError({"password_old": "old password is not correct"})    
+            raise serializers.ValidationError({"message": "old password is not correct",  "status_code":400})    
         if password !=confirm_password:
-            raise serializers.ValidationError({"password": "password do not match"})
+            raise serializers.ValidationError({"message": "password do not match",  "status_code":400})
         return validate_data
 
 class ChangeProfileSerializer(serializers.ModelSerializer):

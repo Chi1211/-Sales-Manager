@@ -51,3 +51,7 @@ class GetWareHouse(models.Model):
 class DateOfWare(models.Model):
     id=models.IntegerField(primary_key=True)
     date=models.DateField()
+
+class ChartProduct(models.Model):
+    total = models.IntegerField()
+    month = models.IntegerField(primary_key=True)

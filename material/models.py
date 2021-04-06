@@ -24,4 +24,9 @@ class GetImportMaterialModel(models.Model):
     amount=models.IntegerField()
     price=models.IntegerField()
     import_date=models.DateTimeField()
+
+class getSum(models.Model):
+    id=models.IntegerField(primary_key=True)
+    sum=models.IntegerField()
+
     
