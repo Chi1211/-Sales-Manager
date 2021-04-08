@@ -71,7 +71,7 @@ class SearchCategoriesView(APIView):
        
 class getFoodView(APIView):
     def get(self, request):
-        food=GetFoodModel.objects.raw("select F.id, F.food_name, F.food_price, F.food_image, Ca.category_name from food_table_manager_foodmodel F  inner join food_table_manager_categoriesmodel Ca on F.category_id=Ca.id")
+        food=GetFoodModel.objects.raw("""select F.id, F.food_name, 1 as "amount", F.food_price, F.food_image, Ca.category_name from food_table_manager_foodmodel F  inner join food_table_manager_categoriesmodel Ca on F.category_id=Ca.id""")
         serializer = GetFoodSerializer(food, many=True)
         response={
             "data": serializer.data,

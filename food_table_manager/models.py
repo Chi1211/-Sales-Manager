@@ -18,6 +18,7 @@ class GetFoodModel(models.Model):
     id=models.IntegerField(primary_key=True)
     food_name=models. CharField(max_length=255)
     food_price=models.IntegerField()
+    amount=models.IntegerField(default=1)
     food_image=models.ImageField(upload_to='food/', null=True, blank=True)
     category_name=models.CharField(max_length=255)
 

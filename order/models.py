@@ -37,4 +37,8 @@ class SumMoneyBill(models.Model):
     id_sum=models.IntegerField(primary_key=True, default=1)
     total=models.IntegerField(default=0)
 
-
+class GetFoodOrdered(models.Model):
+    id = models.IntegerField(primary_key=True)
+    food_name = models.CharField(max_length=255)
+    amount = models.IntegerField()
+    food_price = models.IntegerField()

@@ -1,4 +1,4 @@
-from .models import BillModel, DetailBillModel, DatabaseListBill, PrintBill, SumMoneyBill
+from .models import BillModel, DetailBillModel, DatabaseListBill, PrintBill, SumMoneyBill, GetFoodOrdered
 from comsum.models import getLossModel
 from rest_framework import serializers
 class BillSerializer(serializers.ModelSerializer):
@@ -26,4 +26,7 @@ class SumMoneyBillSerializer(serializers.ModelSerializer):
         model=SumMoneyBill
         fields=['id_sum','total']
 
-
+class GetFoodOrderedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GetFoodOrdered
+        fields = '__all__'

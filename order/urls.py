@@ -9,5 +9,6 @@ urlpatterns=[
     path('list_bill/', views.GetListBillView.as_view()),
     path('print_bill/<int:pk>', views.PrintBillView.as_view()),
     path('sum_bill/<int:pk>', views.SumBill.as_view()),
-  
+    #get order
+    path('get_food_ordered/<int:pk>', views.GetOrderedView.as_view()),
 ]

@@ -21,7 +21,7 @@ class RegisterView(APIView):
                 'status_code':201,
             }
             return Response(response, status=201)
-        return Response(serializer.errors, status=400)
+        return Response(serializer.errors, status=200)
 
 class LoginView(APIView):
     permission_classes=(AllowAny,)
@@ -89,7 +89,7 @@ class ChangeProfileView(APIView):
                 "status_code": 200
             }
             return Response(response, status=200)
-        return Response({"detai":"error"}, status=400)
+        return Response({"detai":"error", "status_code":400}, status=200)
     def put(self, request, username):
         # username=request.data['username']
         user=User.objects.get(username=username)
@@ -101,7 +101,7 @@ class ChangeProfileView(APIView):
                 "status_code": 200
             }
             return Response(response, status=200)
-        return Response(serializer.errors, status=400)
+        return Response(serializer.errors, status=200)
 
 class UserView(APIView):
     # permission_classes=(IsSuperUser,)
@@ -126,7 +126,7 @@ class UpdateUserView(APIView):
                 "status_code": 200
             }
             return Response(response, status=200)
-        return Response({"detai":"error"}, status=400)
+        return Response({"detai":"error", "status_code":400}, status=200)
 
     def put(self, request, username):
         # username=request.data['username']

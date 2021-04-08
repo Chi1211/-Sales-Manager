@@ -23,11 +23,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         is_staff=validate_data["is_staff"]
 
         if User.objects.filter(username=username):
-            raise serializers.ValidationError({"username":"usename already exists"})
+            raise serializers.ValidationError({"username":"usename already exists", "status_code":400})
         if User.objects.filter(email=email):
-            raise serializers.ValidationError({"email": "email already exists"})
+            raise serializers.ValidationError({"email": "email already exists", "status_code":400})
         if password !=confirm_password:
-            raise serializers.ValidationError({"password": "password do not match"})
+            raise serializers.ValidationError({"password": "password do not match", "status_code":400})
 
         user = User(username=username, email=email, is_staff=is_staff)
         user.set_password(password)
@@ -74,7 +74,7 @@ class LoginSerializer(serializers.ModelSerializer):
             user=authenticate(username=username, password=password) 
 
         if user is None:
-            raise serializers.ValidationError({"login":"account incorrect"})
+            raise serializers.ValidationError({"login":"account incorrect", "status_code":400})
         validate_data['user']=user
         return validate_data
 
@@ -115,7 +115,7 @@ class ChangeProfileSerializer(serializers.ModelSerializer):
         email=validate_data.get('email', None)
         user= User.objects.get(email=email)
         if user and str(user.username)!=username:
-            raise serializers.ValidationError({"email": "email already exists"})
+            raise serializers.ValidationError({"email": "email already exists", "status_code":400})
 
         instance.last_name = validate_data.get('last_name', instance.last_name)
         instance.first_name = validate_data.get('first_name', instance.first_name)

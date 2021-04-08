@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .models import BillModel, DetailBillModel, DatabaseListBill, PrintBill, SumMoneyBill
-from .serializers import BillSerializer, DetailBillSerializer, ListBillSerializer, PrintBillSerializer, SumMoneyBillSerializer
+from .models import BillModel, DetailBillModel, DatabaseListBill, PrintBill, SumMoneyBill, GetFoodOrdered
+from .serializers import BillSerializer, DetailBillSerializer, ListBillSerializer, PrintBillSerializer, SumMoneyBillSerializer, GetFoodOrderedSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -154,7 +154,7 @@ class SumBill(APIView):
         serializer=DetailBillSerializer(total1, many=True)
         sum=0
         for data in serializer.data:
-            print(type(sum), type(data['price']), "AAA")
+            # print(type(sum), type(data['price']), "AAA")
             sum+=data['amount']*int(data['price'])
         response = {
             "sum": sum,
@@ -162,3 +162,14 @@ class SumBill(APIView):
         }
         return Response(response, status=status.HTTP_200_OK)
 
+class GetOrderedView(APIView):
+    def get(self, request, pk):
+        order_food_name = GetFoodOrdered.objects.raw(f"""SELECT D.food_id_id as id, F.food_name AS food_name, f.food_price AS food_price, D.amount AS amount
+        FROM order_detailbillmodel AS D, food_table_manager_foodmodel AS F, order_billmodel as B 	
+        WHERE D.food_id_id = F.id AND D.bill_id_id=B.id and B.status=False and B.table_id_id={pk}""")
+        serializer = GetFoodOrderedSerializer(order_food_name, many=True)
+        response = {
+            "data": serializer.data,
+            "status_code": status.HTTP_200_OK
+        }
+        return Response(response, status=status.HTTP_200_OK)
