@@ -42,3 +42,23 @@ class GetFoodOrdered(models.Model):
     food_name = models.CharField(max_length=255)
     amount = models.IntegerField()
     food_price = models.IntegerField()
+
+
+class GetFoodOrdered(models.Model):
+    food_name = models.CharField(max_length=255)
+    amount = models.IntegerField()
+    price = models.IntegerField()
+
+class GetFoodId(models.Model):
+    food_id = models.IntegerField(primary_key=True)
+
+class GetAmount(models.Model):
+    amount = models.IntegerField(primary_key=True)
+
+class GetDem(models.Model):
+    dem = models.IntegerField(primary_key=True)
+
+class BillId(models.Model):
+    bill_id = models.IntegerField(primary_key=True)
+    time_created = models.DateTimeField()
+    table_name = models.CharField(max_length=255)
