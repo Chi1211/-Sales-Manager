@@ -1,4 +1,4 @@
-from .models import GetDem, GetFoodId, BillId, BillModel, DetailBillModel, DatabaseListBill, PrintBill, SumMoneyBill, GetFoodOrdered
+from .models import SumMoney, getPriceFood, GetFoodId, GetBillId, GetCount, PrintBill, GetBillInfo, GetDem, GetFoodId, BillId, BillModel, DetailBillModel, DatabaseListBill, PrintBill, SumMoneyBill, GetFoodOrdered
 from comsum.models import getLossModel
 from rest_framework import serializers
 class BillSerializer(serializers.ModelSerializer):
@@ -50,3 +50,38 @@ class BillaSerializer(serializers.ModelSerializer):
     class Meta:
         model = BillId
         fields = ['bill_id']
+
+class GetBillInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GetBillInfo
+        fields = '__all__'
+
+class PrintBillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=PrintBill
+        fields=['food_name', 'price', 'amount', 'total_price']
+
+class GetFoodIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GetFoodId
+        fields = ['food_id']
+
+class GetBillIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GetBillId
+        fields = ['bill_id']
+
+class GetCountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GetCount
+        fields = ['count']
+
+class GetPriceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = getPriceFood
+        fields = '__all__'
+
+class SumMoneySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SumMoney
+        fields = '__all__'

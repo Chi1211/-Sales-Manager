@@ -4,10 +4,18 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db import connection
 from datetime import date
-from .models import LossModel, getLossModel, ConsumptionModel, SaveConsumption, WareHouse, StatisticalModel, ConsumpFoodModel, GetStatistics, General, GetWareHouse, DateOfWare, ChartProduct
-from .serializers import SaveConsumptionSerializer, WareHouseSerializer, LossModelSerializer, LossSerializer, StatisticalSerializer, ConsumpFoodSerializer, StatisticsSerializer, GeneralaaSerializer, GetWareHouseSerializer, DateOfWareSerializer, ChartProductSerializer
+from .models import getConsumptionModel, LossModel, getLossModel, ConsumptionModel, SaveConsumption, WareHouse, StatisticalModel, ConsumpFoodModel, GetStatistics, General, GetWareHouse, DateOfWare, ChartProduct
+from .serializers import getConsumptionSerializer, SaveConsumptionSerializer, WareHouseSerializer, LossModelSerializer, LossSerializer, StatisticalSerializer, ConsumpFoodSerializer, StatisticsSerializer, GeneralaaSerializer, GetWareHouseSerializer, DateOfWareSerializer, ChartProductSerializer
 # Create your views here.
 class ConsumptionView(APIView):
+    def get(self, request):
+        con=getConsumptionModel.objects.raw('select F.id, material_name, amount_consumption, time_consumption from comsum_consumptionmodel as Co, material_materialmodel as F where Co.material_id=F.id and time_consumption::date=current_date')
+        serializer=getConsumptionSerializer(con, many=True)
+        response = {
+            "data": serializer.data,
+            "status_code": status.HTTP_200_OK
+        }
+        return Response(response, status=status.HTTP_200_OK)        
     def post(self, request):
         con=SaveConsumption.objects.raw("""select material_id, sum(DF.amount_material*BD.amount) as "sum_material"
             from food_table_manager_detailfoodmodel DF,

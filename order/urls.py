@@ -1,16 +1,15 @@
 from django.urls import path
 from . import views
 urlpatterns=[
-    # path('create_bill/', views.CreateBillView.as_view()),
-    # path('update_bill/<int:pk>', views.UpdateBillView.as_view()),
+# Truyền đối số table_id vào ô tham số pk
+    # Thanh toán
     path('pay_bill/<int:pk>', views.BillPayView.as_view()),
-    # path('update_detail_bill/', views.InsertBillInfoView.as_view()),
+    # Chuyển bàn
     path('switch_table/', views.SwitchTableView.as_view()),
-    # path('list_bill/', views.GetListBillView.as_view()),
+    # In hóa đơn
     path('print_bill/<int:pk>', views.PrintBillView.as_view()),
-    # path('sum_bill/<int:pk>', views.SumBill.as_view()),
-    #get order
-    #path('get_food_ordered/<int:pk>', views.GetOrderedView.as_view()),
-    # truyền bàn
-    path('food_ordered/', views.OrderFoodView.as_view()),
+    # In list món ăn bàn đó đã gọi
+    path('food_ordered/<int:pk>', views.GetOrderedView.as_view()),
+    # Gọi món ăn(Tạo bill gọi món)
+    path('order_food/', views.OrderFoodView.as_view())
 ]

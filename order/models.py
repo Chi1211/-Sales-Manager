@@ -45,9 +45,9 @@ class GetFoodOrdered(models.Model):
 
 
 class GetFoodOrdered(models.Model):
-    food_name = models.CharField(max_length=255)
+    food_name = models.CharField(primary_key=True, max_length=255)
     amount = models.IntegerField()
-    price = models.IntegerField()
+    food_price = models.IntegerField()
 
 class GetFoodId(models.Model):
     food_id = models.IntegerField(primary_key=True)
@@ -62,3 +62,34 @@ class BillId(models.Model):
     bill_id = models.IntegerField(primary_key=True)
     time_created = models.DateTimeField()
     table_name = models.CharField(max_length=255)
+
+class getPriceFood(models.Model):
+    food_price = models.IntegerField(primary_key=True)
+
+
+class GetBillInfo(models.Model):
+    bill_id = models.IntegerField(primary_key=True)
+    table_name = models.CharField(max_length=255)
+    time_created = models.DateTimeField()
+    total_price = models.IntegerField()
+
+class PrintBill(models.Model):
+    bill_id = models.IntegerField(primary_key=True)
+    table_name = models.CharField(max_length=255)
+    time_created = models.DateTimeField()
+    food_name = models.CharField(max_length=255)
+    price = models.IntegerField()
+    amount = models.IntegerField()
+    total_price = models.IntegerField()
+
+class GetFoodId(models.Model):
+    food_id = models.IntegerField(primary_key=True)
+
+class GetBillId(models.Model):
+    bill_id = models.IntegerField(primary_key=True)
+
+class GetCount(models.Model):
+    count = models.IntegerField(primary_key=True)
+
+class SumMoney(models.Model):
+    sum_price = models.IntegerField(primary_key=True)

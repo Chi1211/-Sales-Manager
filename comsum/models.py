@@ -15,6 +15,12 @@ class ConsumptionModel(models.Model):
     amount_consumption=models.IntegerField()
     time_consumption=models.DateField()
 
+class getConsumptionModel(models.Model):
+    id=models.IntegerField(primary_key=True)
+    material=models.CharField(max_length=255)
+    amount_consumption=models.IntegerField()
+    time_consumption=models.DateField()
+    
 class SaveConsumption(models.Model):
     material_id=models.IntegerField(primary_key=True)
     sum_material=models.IntegerField()
