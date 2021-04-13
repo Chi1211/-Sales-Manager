@@ -59,7 +59,7 @@ class GetBillInfoSerializer(serializers.ModelSerializer):
 class PrintBillSerializer(serializers.ModelSerializer):
     class Meta:
         model=PrintBill
-        fields=['food_name', 'price', 'amount', 'total_price']
+        fields=['food_name', 'price', 'amount']
 
 class GetFoodIdSerializer(serializers.ModelSerializer):
     class Meta:

@@ -31,7 +31,6 @@ class PrintBill(models.Model):
     food_name = models.CharField(max_length=255)
     price = models.IntegerField()
     amount = models.IntegerField()
-    total_price = models.IntegerField()
     
 class SumMoneyBill(models.Model):
     id_sum=models.IntegerField(primary_key=True, default=1)
@@ -45,7 +44,8 @@ class GetFoodOrdered(models.Model):
 
 
 class GetFoodOrdered(models.Model):
-    food_name = models.CharField(primary_key=True, max_length=255)
+    id=models.IntegerField(primary_key=True)
+    food_name = models.CharField(max_length=255)
     amount = models.IntegerField()
     food_price = models.IntegerField()
 

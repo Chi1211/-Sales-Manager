@@ -46,7 +46,7 @@ class LoginView(APIView):
 
 
 class LogoutView(APIView):
-    permission_classes=(AllowAny,)
+    # permission_classes=(AllowAny,)
     def post(self, request):
         tokens = OutstandingToken.objects.filter(user_id=request.user.id)
         for token in tokens:

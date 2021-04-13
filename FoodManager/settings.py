@@ -61,6 +61,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',    
     'django.middleware.common.CommonMiddleware',
+    'FoodManager.middleware.CheckBlackListMiddleWare',
 ]
 
 ROOT_URLCONF = 'FoodManager.urls'

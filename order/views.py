@@ -11,15 +11,6 @@ from authentication.models import User
 
 # In hóa đơn
 class PrintBillView(APIView):
-    
-    def getSum(self, table_id):
-        sum_sum = SumMoney.objects.raw(f"""SELECT SUM(price) AS sum_price FROM order_detailbillmodel 
-WHERE bill_id_id = (SELECT id FROM order_billmodel WHERE table_id_id = {table_id} AND status=false)""")
-        sumSerializer = SumMoneySerializer(sum_sum, many=True)
-        try:
-            return (sumSerializer.data[0])['sum_price']
-        except:
-            return 0
 
     def get(self, request, pk):
         table_id = pk
@@ -29,11 +20,10 @@ WHERE bill_id_id = (SELECT id FROM order_billmodel WHERE table_id_id = {table_id
         except:
             a = 0
         if a:
-            print("xin chào")
-            bill = PrintBill.objects.raw(f"""SELECT B.id AS "bill_id", TB.name AS "table_name"
+            #print("xin chào")
+            bill = PrintBill.objects.raw(f"""SELECT B.id AS "bill_id"
                 , B.time_created AS "time_created" , F.food_name AS "food_name"
                 , BD.amount AS "amount", BD.price AS "price"
-                , (BD.amount*BD.price) AS "total_price"
                 FROM order_billmodel B, order_detailbillmodel BD, food_table_manager_foodmodel F, food_table_manager_tablemodel TB
                 WHERE B.id = BD.bill_id_id AND BD.food_id_id = F.id AND TB.id = B.table_id_id AND B.status = false AND TB.id = {table_id}""")
         
@@ -45,13 +35,11 @@ WHERE bill_id_id = (SELECT id FROM order_billmodel WHERE table_id_id = {table_id
                 WHERE B.id = BD.bill_id_id AND BD.food_id_id = F.id AND TB.id = B.table_id_id AND B.status = false AND TB.id = {table_id}
                 GROUP BY B.id, TB.name, B.time_created, time_created""")
             bill_Info = GetBillInfoSerializer(billInfo, many=True)
-            total = self.getSum(pk)  
             response = {
                 "bill_id": (bill_Info.data[0])['bill_id'],
                 "table_name": (bill_Info.data[0])['table_name'],
                 "time_created": (bill_Info.data[0])['time_created'],
                 "total_price": (bill_Info.data[0])['total_price'],
-                "total": total,
                 "data": serializer.data,
                 "status_code": status.HTTP_200_OK
             }
@@ -101,7 +89,7 @@ class SwitchTableView(APIView):
 class GetOrderedView(APIView):
 
     def get(self, request, pk):
-        order_food_name = GetFoodOrdered.objects.raw(f"""SELECT F.food_name AS food_name, f.food_price AS food_price, D.amount AS amount
+        order_food_name = GetFoodOrdered.objects.raw(f"""SELECT F.id, F.food_name AS food_name, f.food_price AS food_price, D.amount AS amount
         FROM order_detailbillmodel AS D, food_table_manager_foodmodel AS F, order_billmodel as B 	
         WHERE D.food_id_id = F.id AND D.bill_id_id=B.id and B.status=False and B.table_id_id={pk}""")
         serializer = GetFoodOrderedSerializer(order_food_name, many=True)
@@ -171,7 +159,7 @@ class OrderFoodView(APIView):
             foods = request.data['list_food']
             for food in foods:
                 food_name = food['food_name']
-                food_amount = food['food_amount']
+                food_amount = food['amount']
                 
                 food_id = self.getFoodId(food_name)
                 check_food_name = self.getCount(food_name, bill_id)
@@ -195,7 +183,8 @@ class OrderFoodView(APIView):
                     food_model = getPriceFood.objects.raw(f"""SELECT food_price FROM food_table_manager_foodmodel WHERE food_name='{food_name}'""")
                     foodSerialzier = GetPriceSerializer(food_model, many=True)
                     food_price = (foodSerialzier.data[0])['food_price']
-                    detail_bill_model = DetailBillModel(bill_id = bill_model, food_id = food, amount = food_amount, price = food_price * food_amount)
+                    #total_price = int(food_price) * int(food_amount)
+                    detail_bill_model = DetailBillModel(bill_id = bill_model, food_id = food, amount = food_amount, price = food_price )
                     detail_bill_model.save()
 
                     #return Response({"data": (foodSerialzier.data[0])['food_price']}, status=200)
