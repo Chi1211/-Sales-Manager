@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 # Create your views here.
 
 class getSupplierView(APIView):
+    permission_classes=(IsAdminUser,)
     def get(self, request):
         supplier=SupplierModel.objects.all()
         serializer = SupplierSerialier(supplier, many=True)
@@ -18,6 +19,7 @@ class getSupplierView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class CreateSupplierView(APIView):
+    permission_classes=(IsAdminUser,)
     # permission_classes=(IsAuthenticated,IsAdminUser, )
     def get(self, request):
         supplier=SupplierModel.objects.all()
@@ -38,6 +40,7 @@ class CreateSupplierView(APIView):
         return Response(response, status=status.HTTP_201_CREATED)
         
 class UpdateSupplierView(APIView):
+    permission_classes=(IsAdminUser,)
     # permission_classes=(IsAuthenticated,IsAdminUser, )
     def get_object(self, pk):
         try: 
@@ -66,6 +69,7 @@ class UpdateSupplierView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class SearchSupplierView(APIView):
+    permission_classes=(IsAdminUser,)
     # permission_classes=(IsAuthenticated,IsAdminUser, )
     def post(self, request):
         name=request.data["supplier_name"]

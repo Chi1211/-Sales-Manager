@@ -19,6 +19,7 @@ class getCategoriesView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class CreateCategoriesView(APIView):
+    permission_classes=(IsAdminUser,)
     # permission_classes=(IsAuthenticated,IsAdminUser, )
     def post(self, request):
         serializer=CategoriesSerializer(data=request.data)
@@ -31,6 +32,7 @@ class CreateCategoriesView(APIView):
         return Response(response, status=status.HTTP_201_CREATED)
 
 class UpdateCategoriesView(APIView):
+    permission_classes=(IsAdminUser,)
     # permission_classes=(IsAuthenticated, IsAdminUser)
     def get_object(self, pk):
         try: 
@@ -71,7 +73,7 @@ class SearchCategoriesView(APIView):
        
 class getFoodView(APIView):
     def get(self, request):
-        food=GetFoodModel.objects.raw("""select F.id, F.food_name, 1 as "amount", F.food_price, F.food_image, Ca.category_name from food_table_manager_foodmodel F  inner join food_table_manager_categoriesmodel Ca on F.category_id=Ca.id""")
+        food=GetFoodModel.objects.raw("select F.id, F.food_name, F.food_price, F.food_image, Ca.category_name from food_table_manager_foodmodel F  inner join food_table_manager_categoriesmodel Ca on F.category_id=Ca.id")
         serializer = GetFoodSerializer(food, many=True)
         response={
             "data": serializer.data,
@@ -81,7 +83,7 @@ class getFoodView(APIView):
 
 class getCategoryFoodView(APIView):
     def get(self, request, category):
-        food=GetFoodModel.objects.raw(f"""select F.id, F.food_name, 1 as "amount", F.food_price, F.food_image from food_table_manager_foodmodel F inner join food_table_manager_categoriesmodel Ca on F.category_id=Ca.id where Ca.category_name='{category}'""")
+        food=GetFoodModel.objects.raw(f"""select F.id, F.food_name,  F.food_price, F.food_image from food_table_manager_foodmodel F inner join food_table_manager_categoriesmodel Ca on F.category_id=Ca.id where Ca.category_name='{category}'""")
         serializer = GetFoodSerializer(food, many=True)
         response={
             "data": serializer.data,
@@ -90,7 +92,7 @@ class getCategoryFoodView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class CreateFoodView(APIView):
-    
+    permission_classes=(IsAdminUser,)
     def post(self, request):
         serializer=FoodSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -102,7 +104,7 @@ class CreateFoodView(APIView):
         return Response(response, status=status.HTTP_201_CREATED)
 
 class UpdateFoodView(APIView):
-
+    permission_classes=(IsAdminUser,)
     def get_object(self, pk):
         try: 
             food=FoodModel.objects.get(pk=pk)
@@ -130,6 +132,7 @@ class UpdateFoodView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class getDetailFoodView(APIView):
+    permission_classes=(IsAdminUser,)
     def get(self, request, pk):
         # return Response(food_id, status=status.HTTP_200_OK)
         detail_food=getDetailFoodModel.objects.raw('select D.id, Ma.material_name, D.amount_material from food_table_manager_detailfoodmodel D inner join material_materialmodel Ma on Ma.id=D.material_id inner join food_table_manager_foodmodel F on F.id=D.food_id where D.food_id='+str(pk))
@@ -159,6 +162,7 @@ class getDetailFoodView(APIView):
         return Response(response, status=200)
 
 class CreateDetailFoodView(APIView):
+    permission_classes=(IsAdminUser,)
     def get(self, request):
         detail_food=getDetailFoodModel.objects.raw('select D.id, Ma.material_name, D.amount_material from food_table_manager_detailfoodmodel D inner join material_materialmodel Ma on Ma.id=D.material_id inner join food_table_manager_foodmodel F on F.id=D.food_id where D.food_id=(select max(id) from food_table_manager_foodmodel)')
         serializer = getDetailFoodSerializer(detail_food, many=True)
@@ -185,6 +189,7 @@ class CreateDetailFoodView(APIView):
         return Response(response, status=status.HTTP_201_CREATED)
 
 class UpdateDetailFoodView(APIView):
+    permission_classes=(IsAdminUser,)
     def get_object(self, pk):
         try: 
             detail_food=DetailFoodModel.objects.get(pk=pk)
@@ -202,6 +207,7 @@ class UpdateDetailFoodView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class getTableView(APIView):
+
     def get(self, request):
         table=TableModel.objects.raw("select * from food_table_manager_tablemodel where status <>'Tạm ngưng hoạt động'")
         serializer = TableSerializer(table, many=True)
@@ -211,7 +217,8 @@ class getTableView(APIView):
         }
         return Response(response, status=status.HTTP_200_OK)
 
-class CreateTableView(APIView):   
+class CreateTableView(APIView): 
+    permission_classes=(IsAdminUser,)  
     def post(self, request):
         serializer=TableSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -317,3 +324,13 @@ class UpdateBookTableView(APIView):
             'status_code': status.HTTP_200_OK
         }
         return Response(response, status=status.HTTP_200_OK)
+
+class CancelBookTableView(APIView):    
+    def post(self, request, pk):
+        with connection.cursor() as cursor:
+            cursor.execute(f"update food_table_manager_tablemodel set status='Trống' where id={pk}")
+        response={
+           'success': "success",
+           'status_code': 200
+        }
+        return Response(response, status=200)

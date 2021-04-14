@@ -7,11 +7,12 @@ from django.contrib.auth import login,logout
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from rest_framework import status
-# from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from .permissions import IsSuperUser
 # from django.contrib.auth.
 # Create your views here.
 class RegisterView(APIView):
+    permission_classes=(IsAuthenticated,IsSuperUser,)
     def post(self, request):
         serializer=RegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -38,7 +39,7 @@ class LoginView(APIView):
             "superuser":user.is_superuser,
             "admin":user.is_staff,
             "status_code": 200,
-            "token": str(access)
+             "token": str(access)
             
         }
 
@@ -46,7 +47,7 @@ class LoginView(APIView):
 
 
 class LogoutView(APIView):
-    # permission_classes=(AllowAny,)
+   
     def post(self, request):
         tokens = OutstandingToken.objects.filter(user_id=request.user.id)
         for token in tokens:
@@ -104,7 +105,7 @@ class ChangeProfileView(APIView):
         return Response(serializer.errors, status=200)
 
 class UserView(APIView):
-    # permission_classes=(IsSuperUser,)
+    permission_classes=(IsSuperUser,)
     def get(self, request):
         user=User.objects.all()
         serializer = UserSerializer(user, many=True)
@@ -115,7 +116,7 @@ class UserView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class UpdateUserView(APIView):
-    # permission_classes=(IsSuperUser,)
+    permission_classes=(IsSuperUser,)
     def get(self, request, username):
         # username=request.data['username']
         user=User.objects.get(username=username)  

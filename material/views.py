@@ -6,8 +6,10 @@ from .serializers import MaterialSerializer, ImportMaterialSerializer, GetImport
 from .models import  MaterialModel, ImportMaterialModel, GetImportMaterialModel, getSum
 from django.db import connection
 from django.db.models import Sum
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 # Create your views here.
 class getMaterialView(APIView):
+    permission_classes=(IsAdminUser,)
     def get(self, request):
         material=MaterialModel.objects.all()
         serializer = MaterialSerializer(material, many=True)
@@ -18,6 +20,7 @@ class getMaterialView(APIView):
         return Response(response, status=status.HTTP_200_OK)
         
 class CreateMaterialView(APIView):
+    permission_classes=(IsAdminUser,)
     def get(self, request):
         material=MaterialModel.objects.all()
         serializer = MaterialSerializer(material, many=True)
@@ -37,6 +40,7 @@ class CreateMaterialView(APIView):
         return Response(response, status=status.HTTP_201_CREATED)
 
 class UpdateMaterialView(APIView):
+    permission_classes=(IsAdminUser,)
     def get_object(self, pk):
         try: 
             material=MaterialModel.objects.get(pk=pk)
@@ -64,6 +68,7 @@ class UpdateMaterialView(APIView):
         return Response(response, status=status.HTTP_200_OK)   
 
 class SearchMaterialView(APIView):
+    permission_classes=(IsAdminUser,)
     def post(self, request):
         name=request.data["material_name"]
         material=MaterialModel.objects.filter(material_name__icontains=name)
@@ -75,6 +80,7 @@ class SearchMaterialView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class getImportMaterialView(APIView):
+    permission_classes=(IsAdminUser,)
     def get(self, request):
         import_material=GetImportMaterialModel.objects.raw('select I.id, Ma.material_name, S.supplier_name, I.amount, I.price, I.import_date from material_importmaterialmodel I inner join material_materialmodel Ma on Ma.id=I.material_id_id inner join supplier_suppliermodel S on S.id=I.supplier_id_id')
         serializer = GetImportMaterialSerializer(import_material, many=True)
@@ -85,6 +91,7 @@ class getImportMaterialView(APIView):
         return Response(response, status=status.HTTP_200_OK)
         
 class CreateImportMaterialView(APIView):
+    permission_classes=(IsAdminUser,)
     def post(self, request):
         try:
             datas = request.data['data']
@@ -102,6 +109,7 @@ class CreateImportMaterialView(APIView):
         return Response(response, status=status.HTTP_201_CREATED)
 
 class SearchImportMaterialNameView(APIView):
+    permission_classes=(IsAdminUser,)
     def post(self, request):
         name=request.data["material_name"]
         
@@ -114,6 +122,7 @@ class SearchImportMaterialNameView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class SearchImportMaterialDateView(APIView):
+    permission_classes=(IsAdminUser,)
     def post(self, request):
         from_date=request.data["from_date"]
         to_date=request.data["to_date"]
@@ -129,6 +138,7 @@ class SearchImportMaterialDateView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 class SumPriceView(APIView):
+    permission_classes=(IsAdminUser,)
     def get(self, request):        
         price=ImportMaterialModel.objects.all().aggregate(Sum('price'))
         print(price, 'AAA')

@@ -6,8 +6,10 @@ from django.db import connection
 from datetime import date
 from .models import getConsumptionModel, LossModel, getLossModel, ConsumptionModel, SaveConsumption, WareHouse, StatisticalModel, ConsumpFoodModel, GetStatistics, General, GetWareHouse, DateOfWare, ChartProduct
 from .serializers import getConsumptionSerializer, SaveConsumptionSerializer, WareHouseSerializer, LossModelSerializer, LossSerializer, StatisticalSerializer, ConsumpFoodSerializer, StatisticsSerializer, GeneralaaSerializer, GetWareHouseSerializer, DateOfWareSerializer, ChartProductSerializer
+from rest_framework.permissions import IsAdminUser
 # Create your views here.
 class ConsumptionView(APIView):
+    permission_classes=(IsAdminUser,)
     def get(self, request):
         con=getConsumptionModel.objects.raw('select F.id, material_name, amount_consumption, time_consumption from comsum_consumptionmodel as Co, material_materialmodel as F where Co.material_id=F.id and time_consumption::date=current_date')
         serializer=getConsumptionSerializer(con, many=True)
@@ -57,6 +59,7 @@ class ConsumptionView(APIView):
 #         return Response(response, status=status.HTTP_200_OK)
 
 class InsertWareHouse(APIView):
+    permission_classes=(IsAdminUser,)
     def get(self, request):
         ware= GetWareHouse.objects.raw("""select W.id, Ma.material_name, W.material_reality  from comsum_warehouse W, material_materialmodel Ma where Ma.id=W.material_id""")
         serializer=GetWareHouseSerializer(ware, many=True)

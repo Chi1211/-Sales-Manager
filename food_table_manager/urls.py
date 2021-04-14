@@ -18,4 +18,6 @@ urlpatterns=[
     path('delete_detailfood/<int:pk>', views.UpdateDetailFoodView.as_view()),
     path('book_table/', views.BookTableView.as_view()),
     path('update_book_table/<int:pk>', views.UpdateBookTableView.as_view()),
+    path('cancel_book_table/<int:pk>', views.CancelBookTableView.as_view()),
+  
 ]
